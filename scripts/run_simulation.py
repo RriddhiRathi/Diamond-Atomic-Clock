@@ -7,6 +7,7 @@ sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from diamondclock.simulation import Config,simulate,ensemble
 from diamondclock.reporting import export_files
 from diamondclock.physics import Physics
+from diamondclock.reference_store import ReferenceStore
 from diamondclock.run_provenance import capture, write_run_directory
 
 def main():
@@ -22,7 +23,7 @@ def main():
     trace,a,d=simulate(c)
     raw=q=None
     if args.ensemble:raw,q=ensemble(c,args.ensemble)
-    files=export_files(trace,a,c,d,quantiles=q,ensemble_raw=raw,run_provenance=context)
+    files=export_files(trace,a,c,d,quantiles=q,ensemble_raw=raw,run_provenance=context,references=ReferenceStore().catalog())
     write_run_directory(args.out,files)
     target=a[(a.method=='composite')].iloc[(a[a.method=='composite'].tau_s-200).abs().argmin()]
     print(f'SIMULATION: composite ADEV {target.adev:.6e} at tau={target.tau_s:g} s')
