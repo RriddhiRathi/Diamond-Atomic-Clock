@@ -26,3 +26,6 @@ outputs/reproduction/
 user_data/
 *.sqlite3-wal
 *.sqlite3-shm
+
+
+*.egg-info/
