@@ -28,9 +28,9 @@ def verification_label(row):
 
 
 def normalize_doi(value):
-    value = re.sub(r"^(?:https?://(?:dx\\.)?doi\\.org/|doi:\\s*)", "",
+    value = re.sub(r"^(?:https?://(?:dx\.)?doi\.org/|doi:\s*)", "",
                    str(value or "").strip(), flags=re.I)
-    if value and not re.fullmatch(r"10\\.\\d{4,9}/[^\\s]+", value):
+    if value and not re.fullmatch(r"10\.\d{4,9}/[^\s]+", value):
         raise ValueError("DOI must have the form 10.xxxx/suffix; this checks syntax only.")
     return value.lower()
 
