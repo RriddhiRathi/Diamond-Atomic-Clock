@@ -1,0 +1,38 @@
+parameter,value,unit,source,locator,note,implementation,doi
+T0_K,297.0,K,L2023,"Table II, p. 064084-5",Expansion temperature,diamondclock/physics.py:Physics.T0_K,10.1103/PhysRevApplied.19.064084
+D0_Hz,2870280000.0,Hz,L2023,"Table II, p. 064084-5",,diamondclock/physics.py:Physics.D0_Hz,10.1103/PhysRevApplied.19.064084
+D1_Hz_K,-72500.0,Hz/K,L2023,"Table II, p. 064084-5",,diamondclock/physics.py:Physics.D1_Hz_K,10.1103/PhysRevApplied.19.064084
+D2_Hz_K2,-390.0,Hz/K^2,L2023,"Table II, p. 064084-5","Second derivative, not polynomial coefficient",diamondclock/physics.py:Physics.D2_Hz_K2,10.1103/PhysRevApplied.19.064084
+Q0_Hz,-4945880.0,Hz,L2023,"Table II, p. 064084-5",Signed quadrupole parameter,diamondclock/physics.py:Physics.Q0_Hz,10.1103/PhysRevApplied.19.064084
+Q1_Hz_K,35.5,Hz/K,L2023,"Table II, p. 064084-5",,diamondclock/physics.py:Physics.Q1_Hz_K,10.1103/PhysRevApplied.19.064084
+Q2_Hz_K2,0.22,Hz/K^2,L2023,"Table II, p. 064084-5",,diamondclock/physics.py:Physics.Q2_Hz_K2,10.1103/PhysRevApplied.19.064084
+Apar0_Hz,-2165190.0,Hz,L2023,"Table II, p. 064084-5",,diamondclock/physics.py:Physics.Apar0_Hz,10.1103/PhysRevApplied.19.064084
+Apar1_Hz_K,197.0,Hz/K,L2023,"Table II, p. 064084-5",,diamondclock/physics.py:Physics.Apar1_Hz_K,10.1103/PhysRevApplied.19.064084
+Apar2_Hz_K2,0.73,Hz/K^2,L2023,"Table II, p. 064084-5",,diamondclock/physics.py:Physics.Apar2_Hz_K2,10.1103/PhysRevApplied.19.064084
+Aperp0_Hz,-2635000.0,Hz,L2023,"Table II, p. 064084-5",,diamondclock/physics.py:Physics.Aperp0_Hz,10.1103/PhysRevApplied.19.064084
+Aperp1_Hz_K,154.0,Hz/K,L2023,"Table II, p. 064084-5",,diamondclock/physics.py:Physics.Aperp1_Hz_K,10.1103/PhysRevApplied.19.064084
+Aperp2_Hz_K2,0.53,Hz/K^2,L2023,"Table II, p. 064084-5",,diamondclock/physics.py:Physics.Aperp2_Hz_K2,10.1103/PhysRevApplied.19.064084
+gamma_e_Hz_G,2803300.0,Hz/G,F2009,"Sec. IV, p. 075203-4; cyclic value quoted in L2023 Sec. II","From axial g=2.0029(2); scalar gamma approximation also used for small Bx, as in L2023",diamondclock/physics.py:Physics.gamma_e_Hz_G,10.1103/PhysRevB.79.075203
+gamma_n_Hz_G,307.59,Hz/G,L2023,"Sec. IV, Eq. (4), p. 064084-6; Sec. II, p. 064084-2",14N value from measured gamma ratio and literature electron gamma; Hamiltonian uses minus sign,diamondclock/physics.py:Physics.gamma_n_Hz_G,10.1103/PhysRevApplied.19.064084
+n,32768.0,samples,MODEL,docs/METHODOLOGY.md,Record length; integer 1024..262144,diamondclock/simulation.py:Config.n,
+dt_s,1.0,s,MODEL,docs/METHODOLOGY.md,Contiguous effective measurement interval,diamondclock/simulation.py:Config.dt_s,
+seed,20261019.0,integer,MODEL,docs/METHODOLOGY.md,NumPy SeedSequence root; independent named component streams,diamondclock/simulation.py:Config.seed,
+Bz_G,475.0,G,MODEL,docs/METHODOLOGY.md,"Bias inspired by L2026; scenario setting, not a measured apparatus",diamondclock/simulation.py:Config.Bz_G,
+Bx_G,0.0,G,MODEL,docs/METHODOLOGY.md,Static misalignment component,diamondclock/simulation.py:Config.Bx_G,
+temp_rms_K,0.05,K,MODEL,docs/METHODOLOGY.md,"Stationary OU RMS, not total trace RMS",diamondclock/simulation.py:Config.temp_rms_K,
+temp_corr_s,300.0,s,MODEL,docs/METHODOLOGY.md,OU temperature correlation time,diamondclock/simulation.py:Config.temp_corr_s,
+temp_sine_K,0.1,K,MODEL,docs/METHODOLOGY.md,Peak environmental temperature cycle amplitude,diamondclock/simulation.py:Config.temp_sine_K,
+temp_period_s,7200.0,s,MODEL,docs/METHODOLOGY.md,Environmental cycle period,diamondclock/simulation.py:Config.temp_period_s,
+temp_drift_K_h,0.002,K/h,MODEL,docs/METHODOLOGY.md,Deterministic thermal drift,diamondclock/simulation.py:Config.temp_drift_K_h,
+Bz_rms_G,0.001,G,MODEL,docs/METHODOLOGY.md,Stationary axial field OU RMS; 1 G = 100 microtesla,diamondclock/simulation.py:Config.Bz_rms_G,
+Bx_rms_G,0.0001,G,MODEL,docs/METHODOLOGY.md,Stationary transverse field OU RMS,diamondclock/simulation.py:Config.Bx_rms_G,
+B_corr_s,100.0,s,MODEL,docs/METHODOLOGY.md,Field OU correlation time,diamondclock/simulation.py:Config.B_corr_s,
+electron_readout_Hz,50.0,Hz,MODEL,docs/METHODOLOGY.md,Independent per-transition Gaussian sigma at dt=1 s; scales dt^-1/2,diamondclock/simulation.py:Config.electron_readout_Hz,
+nuclear_readout_Hz,0.03,Hz,MODEL,docs/METHODOLOGY.md,Independent per-transition Gaussian sigma at dt=1 s; scales dt^-1/2,diamondclock/simulation.py:Config.nuclear_readout_Hz,
+readout_rho,0.0,dimensionless,MODEL,docs/METHODOLOGY.md,Correlation of the two transition errors within each pair,diamondclock/simulation.py:Config.readout_rho,
+thermometer_rms_K,0.001,K,MODEL,docs/METHODOLOGY.md,White thermometer sigma at dt=1 s,diamondclock/simulation.py:Config.thermometer_rms_K,
+thermometer_delay_s,0.0,s,MODEL,docs/METHODOLOGY.md,Delay rounded to nearest sample; startup held at first reading,diamondclock/simulation.py:Config.thermometer_delay_s,
+slope_error_pct,1.0,%,MODEL,docs/METHODOLOGY.md,Q slope relative calibration error; also external thermometer D-slope error,diamondclock/simulation.py:Config.slope_error_pct,
+lo_white_adev_1s,1e-09,fractional,MODEL,docs/METHODOLOGY.md,Residual white FM ADEV at 1 s; no feedback suppression is inferred,diamondclock/simulation.py:Config.lo_white_adev_1s,
+lo_rw_diffusion,1e-11,fractional/sqrt(s),MODEL,docs/METHODOLOGY.md,Random-walk FM step diffusion; starts at zero,diamondclock/simulation.py:Config.lo_rw_diffusion,
+lo_drift_per_s,0.0,fractional/s,MODEL,docs/METHODOLOGY.md,Residual deterministic oscillator frequency drift,diamondclock/simulation.py:Config.lo_drift_per_s,

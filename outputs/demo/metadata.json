@@ -1,0 +1,111 @@
+{
+  "project": "Diamond Atomic Clock",
+  "version": "0.1.0",
+  "data_kind": "SIMULATION",
+  "config": {
+    "n": 32768,
+    "dt_s": 1.0,
+    "seed": 20261019,
+    "Bz_G": 475.0,
+    "Bx_G": 0.0,
+    "temp_rms_K": 0.05,
+    "temp_corr_s": 300.0,
+    "temp_sine_K": 0.1,
+    "temp_period_s": 7200.0,
+    "temp_drift_K_h": 0.002,
+    "Bz_rms_G": 0.001,
+    "Bx_rms_G": 0.0001,
+    "B_corr_s": 100.0,
+    "electron_readout_Hz": 50.0,
+    "nuclear_readout_Hz": 0.03,
+    "readout_rho": 0.0,
+    "thermometer_rms_K": 0.001,
+    "thermometer_delay_s": 0.0,
+    "slope_error_pct": 1.0,
+    "lo_white_adev_1s": 1e-09,
+    "lo_rw_diffusion": 1e-11,
+    "lo_drift_per_s": 0.0
+  },
+  "physics": {
+    "T0_K": 297.0,
+    "D0_Hz": 2870280000.0,
+    "D1_Hz_K": -72500.0,
+    "D2_Hz_K2": -390.0,
+    "Q0_Hz": -4945880.0,
+    "Q1_Hz_K": 35.5,
+    "Q2_Hz_K2": 0.22,
+    "Apar0_Hz": -2165190.0,
+    "Apar1_Hz_K": 197.0,
+    "Apar2_Hz_K2": 0.73,
+    "Aperp0_Hz": -2635000.0,
+    "Aperp1_Hz_K": 154.0,
+    "Aperp2_Hz_K2": 0.53,
+    "gamma_e_Hz_G": 2803300.0,
+    "gamma_n_Hz_G": 307.59
+  },
+  "diagnostics": {
+    "nominal_Hz": [
+      4199683960.4212384,
+      1540883861.3597746,
+      5087461.273657724,
+      4798098.667643879,
+      2870283910.8905067,
+      -4942779.970650801
+    ],
+    "slope_Hz_K": [
+      -72303.16445827484,
+      -72697.4790096283,
+      -35.18525417894125,
+      -35.335202142596245,
+      -72500.3217458725,
+      35.26022816076875
+    ],
+    "lambda_per_K": [
+      -1.7216334643196023e-05,
+      -4.7179077432529786e-05,
+      -6.9160731229791085e-06,
+      -7.364417572502257e-06,
+      -2.5258937441968674e-05,
+      -7.133683548557015e-06
+    ],
+    "wD": -0.3990834986626579,
+    "wQ": 1.399083498662658,
+    "thermal_sensitivity_composite_per_K": 9.980618937467124e-08,
+    "actual_thermometer_delay_s": 0.0,
+    "peak_temperature_excursion_K": 0.2457615862076413
+  },
+  "environment": {
+    "python": "3.12.14",
+    "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+    "packages": {
+      "numpy": "2.3.5",
+      "scipy": "1.17.0",
+      "pandas": "2.2.3",
+      "matplotlib": "3.10.8",
+      "plotly": "7.1.0",
+      "streamlit": "1.66.0",
+      "allantools": "2024.6",
+      "pytest": "9.1.1"
+    }
+  },
+  "source_sha256": {
+    "diamondclock/__init__.py": "99feadbf5b3416e927cccd19e3e938d184ef7c65eb7de28a9a0f290ad7491a33",
+    "diamondclock/physics.py": "280c58b83a21d0d3e227a34f91e76a4a93e92406153c54fe2f4fc6147d96f8e5",
+    "diamondclock/reporting.py": "1bc4000411153ba3d15b04658fd0fb8bd23dc51c3fca8082c9b8ec796ecb7118",
+    "diamondclock/simulation.py": "498022fca8e556f67c918fed1b4b3bd2aed878efd433de40149e039b6360b48b",
+    "diamondclock/stability.py": "34e6389af1c730643a28304e6270b3dcedf6dc6ee6f8ca769c81aeadbcbd0847",
+    "references/benchmarks.csv": "db8c6ecbc3a80058cbdff15c315333fa2fe7f0c2473d32e144d49673cded97a2",
+    "references/equation_map.md": "d707a85608478f899496113340a3801d53ed8df7fff64ef50c23e19c839f7f96",
+    "references/parameter_provenance.csv": "72cbff43123d6c13c95267dcecc3dda15394a0519c547e04341b49afd071983e",
+    "references/references.bib": "8027425f196c2d9df64e7abd10fd9d5b076297a1bc48f1ec38c2dfbdfc70cf9d",
+    "references/sources.json": "eaa53392848e903dc2bfc525e6369986bf4431732d10a7aaa92e243ce85c9eee",
+    "docs/METHODOLOGY.md": "23913729d454c768f18263dc023ffa066e29e3574fd5a02775ac0927ced145b5",
+    "docs/PAPER_NOTES.md": "181f4152d059b0e8fd222392ee6ea093d27efa592b065cfa0e1c0db2c5310992",
+    "docs/VALIDATION.md": "3a2f022674669cbb12b273ee586ac79e4ca51fce14552dfc77c6cf1abd4b4bac",
+    "app.py": "7f47bddd3c92cf7648b89d082fbd0d782ec44f4024bdf2f2649908e4ed6139c3"
+  },
+  "estimator": "overlapping Allan deviation, no drift removal; tau <= N*dt/10",
+  "sample_convention": "Effective contiguous rectangular interval averages; environmental Hamiltonian evaluated at one representative value per interval",
+  "scope": "Conditional frequency-reference simulation with additive residual LO; no servo, Dick effect, or experimental apparatus fitted",
+  "uncertainty": "Any ensemble band represents only the assumed stochastic processes; parameter uncertainty not propagated"
+}

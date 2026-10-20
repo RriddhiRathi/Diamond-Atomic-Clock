@@ -1,0 +1,3 @@
+source_id,tau_s,adev_limit,relation,evidence,locator,note
+L2026,200,5e-9,<,PUBLISHED_MEASUREMENT_UPPER_LIMIT,"Abstract p. 064046-1; Fig. 3","10-day room-temperature comparison to Rb reference; no raw data imported"
+L2026,200000,1e-8,<,PUBLISHED_MEASUREMENT_UPPER_LIMIT,"Abstract p. 064046-1; Fig. 3","Upper limit; do not treat as exact measured value or extend a short simulation to this tau"

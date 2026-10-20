@@ -1,0 +1,9 @@
+[project]
+name = "diamondclock-lab"
+version = "0.1.0"
+description = "Research-traceable conditional NV-center frequency stability simulator"
+requires-python = ">=3.11,<3.14"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
