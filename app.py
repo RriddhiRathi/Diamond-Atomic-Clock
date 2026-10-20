@@ -1,6 +1,8 @@
 """Run: python -m streamlit run app.py"""
 from dataclasses import asdict
 import json
+import sqlite3
+import hashlib
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
@@ -9,6 +11,9 @@ import streamlit as st
 from diamondclock.simulation import Config, METHODS, simulate, ensemble
 from diamondclock.physics import Physics
 from diamondclock.reporting import (ROOT,COLORS,sources,provenance,benchmarks,export_files,zip_files)
+
+from diamondclock.reference_store import ReferenceStore, verification_label, catalog_bytes, bibtex_bytes
+from diamondclock.run_provenance import capture, validate, source_fingerprint
 
 st.set_page_config(page_title='Diamond Atomic Clock',page_icon='💎',layout='wide')
 st.markdown('''<style>
@@ -23,12 +28,18 @@ st.markdown('Explore how diamond spin transitions respond to their environment�
 st.info('SIMULATION · Conditional results from assumed noise inputs. Published limits and theoretical projections are labeled separately. This is a frequency-reference model with residual oscillator noise, not a validated hardware clock.')
 
 @st.cache_data(show_spinner=False)
-def cached_run(values):
-    return simulate(Config(**values))
+def cached_run(values,fingerprint):
+    context=capture(config=Config(**values),physics=Physics())
+    result=simulate(Config(**values))
+    validate(context)
+    return (*result,context)
 
 @st.cache_data(show_spinner=False)
-def cached_ensemble(values,count):
-    return ensemble(Config(**values),count)
+def cached_ensemble(values,count,fingerprint):
+    context=capture(config=Config(**values),physics=Physics())
+    result=ensemble(Config(**values),count)
+    validate(context)
+    return result
 
 with st.sidebar:
     st.markdown('### Experiment controls')
@@ -70,7 +81,9 @@ with st.sidebar:
 
 try:
     with st.spinner('Solving the spin Hamiltonian and calculating overlapping Allan deviation…'):
-        trace,a,diag=cached_run(asdict(c))
+        fingerprint=source_fingerprint()
+        trace,a,diag,run_context=cached_run(asdict(c),fingerprint)
+        validate(run_context)
 except ValueError as exc:
     st.error(str(exc));st.stop()
 
@@ -134,11 +147,11 @@ with tabs[2]:
     count=st.select_slider('Independent model realizations',[3,5,10,20,40],value=10)
     if st.button('Calculate ensemble variability',key='run_ensemble'):
         with st.spinner(f'Calculating {count} independent realizations…'):
-            raw,q=cached_ensemble(asdict(c),count)
-        st.session_state['ensemble_result']=(asdict(c),raw,q)
+            raw,q=cached_ensemble(asdict(c),count,fingerprint)
+        st.session_state['ensemble_result']=((asdict(c),fingerprint),raw,q)
         st.session_state.pop('export',None)
     saved=st.session_state.get('ensemble_result')
-    if saved is not None and saved[0]==asdict(c):
+    if saved is not None and saved[0]==(asdict(c),fingerprint):
         raw,q=saved[1:]
         ef=go.Figure()
         for (key,label),color in zip(METHODS.items(),COLORS):
@@ -163,14 +176,18 @@ with tabs[3]:
 
 with tabs[4]:
     st.subheader('Research Paper Bucket')
-    if 'paper_bucket' not in st.session_state:
-        st.session_state['paper_bucket']=sources()
-    paper_bucket=st.session_state['paper_bucket']
-    paper_count=sum(source['id'] != 'MODEL' for source in paper_bucket)
-    st.info(f'{paper_count} papers/research references and {len(paper_bucket)} total references are currently in the bucket. Papers are sorted by publication year.')
+    reference_store=None
+    reference_error=None
+    try:
+        reference_store=ReferenceStore()
+        paper_bucket=reference_store.catalog()
+    except (OSError,sqlite3.Error,ValueError) as exc:
+        reference_error=str(exc)
+        paper_bucket=sources()
+        st.error('Persistent references unavailable: '+reference_error)
     query=st.text_input('Search papers, equations, parameters, or implementation')
     with st.expander('Add a paper'):
-        st.caption('Added papers are available for this dashboard session and can be included in a future curated bibliography.')
+        st.caption('Added papers are saved to this installation and exported as unverified references. A DOI does not verify a paper or map it to the scientific model.')
         with st.form('add_paper'):
             title=st.text_input('Title')
             authors=st.text_input('Authors')
@@ -181,36 +198,38 @@ with tabs[4]:
             note=st.text_area('Note (optional)')
             submitted=st.form_submit_button('Add paper',type='primary')
         if submitted:
-            if not title.strip() or not authors.strip() or not journal.strip() or not url.strip():
-                st.error('Title, authors, journal, and paper URL are required.')
-            else:
-                custom_number=sum(source['id'].startswith('USER-') for source in paper_bucket)+1
-                paper_bucket.append({
-                    'id':f'USER-{custom_number:03d}',
-                    'title':title.strip(),
-                    'authors':authors.strip(),
-                    'year':int(year),
-                    'journal':journal.strip(),
-                    'doi':doi.strip() or None,
-                    'url':url.strip(),
-                    'evidence':'User-added reference',
-                    'verified':'Not verified by project',
-                    'locator':'User supplied',
-                    'implementation':'Not mapped',
-                    'note':note.strip() or 'Added by a dashboard user.'
-                })
-                st.session_state['paper_bucket']=paper_bucket
-                st.success(f'Added "{title.strip()}".')
+            try:
+                if reference_store is None:
+                    raise ValueError('Persistent storage is unavailable. Reference was not saved.')
+                reference_store.add(dict(title=title,authors=authors,year=year,journal=journal,
+                                         doi=doi,url=url,note=note))
+                paper_bucket=reference_store.catalog()
+                st.session_state.pop('export',None)
+                st.success(f'Added "{title.strip()}". Saved as unverified.')
+            except (ValueError,OSError,sqlite3.Error) as exc:
+                st.error(str(exc))
+    paper_count=sum(source['id']!='MODEL' for source in paper_bucket)
+    st.info(f'{paper_count} papers/research references and {len(paper_bucket)} total references are currently in the bucket.')
+    catalog_data=catalog_bytes(paper_bucket)
+    catalog_digest=hashlib.sha256(catalog_data).hexdigest()
+    st.download_button('Download Paper Bucket JSON',catalog_data,'sources.json','application/json',
+                       disabled=reference_error is not None)
+    st.download_button('Download Paper Bucket BibTeX',bibtex_bytes(paper_bucket),
+                       'references.bib','application/x-bibtex',disabled=reference_error is not None)
     visible_papers=sorted(paper_bucket,key=lambda source:(source['year'],source['title'].lower()))
     for source in visible_papers:
         if query and query.lower() not in json.dumps(source).lower():continue
         with st.expander(f"[{source['id']}] {source['title']} ({source['year']})"):
             st.write(source['authors']+' · '+source['journal'])
+            st.write('Verification: '+verification_label(source))
             st.write('Evidence: '+source['evidence'])
             st.write('Location: '+source['locator'])
             st.code(source['implementation'],language=None)
             st.write(source['note'])
-            if source['doi']:st.markdown(f"[DOI: {source['doi']}](https://doi.org/{source['doi']}) · [Verified source]({source['url']})")
+            if source.get('doi'):
+                st.link_button('DOI: '+source['doi'],'https://doi.org/'+source['doi'])
+            if source.get('url','').startswith(('https://','http://')):
+                st.link_button('Source link',source['url'])
     st.markdown('#### Every active parameter')
     active_parameters=provenance(c)
     if query:
@@ -227,13 +246,17 @@ with tabs[5]:
     st.markdown('Export the full time series, Allan results, configuration, source and parameter provenance, environment versions, checksums, and vector SVG/PDF figure. The export figure includes all five signals, irrespective of visibility selections above.')
     saved=st.session_state.get('ensemble_result')
     q=raw=None
-    if saved is not None and saved[0]==asdict(c):raw,q=saved[1:]
-    if st.button('Prepare reproducible export',type='primary',key='prepare_export'):
+    if saved is not None and saved[0]==(asdict(c),fingerprint):raw,q=saved[1:]
+    if st.button('Prepare reproducible export',type='primary',key='prepare_export',disabled=reference_error is not None):
         with st.spinner('Building dataset and vector figures…'):
-            files=export_files(trace,a,c,diag,quantiles=q,ensemble_raw=raw)
-        st.session_state['export']=(asdict(c),files)
+            try:
+                files=export_files(trace,a,c,diag,quantiles=q,ensemble_raw=raw,
+                                   run_provenance=run_context,references=paper_bucket)
+            except ValueError as exc:
+                st.error(str(exc));st.stop()
+        st.session_state['export']=((asdict(c),fingerprint,catalog_digest),files)
     saved_export=st.session_state.get('export')
-    if saved_export is not None and saved_export[0]==asdict(c):
+    if saved_export is not None and saved_export[0]==(asdict(c),fingerprint,catalog_digest):
         files=saved_export[1]
         st.download_button('Download complete run (.zip)',zip_files(files),'DiamondAtomicClock_run_SIMULATION.zip','application/zip')
         left,right=st.columns(2)

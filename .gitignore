@@ -22,3 +22,7 @@ outputs/reproduction/
 # Temporary files
 *.log
 *.tmp
+# Persistent installation-local Paper Bucket (configure a durable volume in hosted apps)
+user_data/
+*.sqlite3-wal
+*.sqlite3-shm
