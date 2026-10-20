@@ -15,13 +15,15 @@ import pandas as pd
 from . import __version__
 from .physics import Physics, parameter_rows
 from .simulation import Config, METHODS
+from .reference_store import curated_sources, catalog_bytes, bibtex_bytes
+from .run_provenance import capture, validate
 
 ROOT=Path(__file__).resolve().parent.parent
 COLORS=['#7c8598','#149ca8','#ed9d38','#aa6bd3','#2470dd']
 
 
 def sources():
-    return json.loads((ROOT/'references/sources.json').read_text(encoding='utf-8'))
+    return curated_sources()
 
 
 def provenance(c=Config(),p=Physics()):
@@ -90,23 +92,32 @@ def environment():
     return dict(python=platform.python_version(),platform=platform.platform(),packages=pkgs)
 
 
-def run_metadata(c,p,diagnostics):
-    inputs={}
-    for folder,pattern in [('diamondclock','*.py'),('references','*'),('docs','*.md')]:
-        for path in sorted((ROOT/folder).glob(pattern)):
-            if path.is_file():
-                inputs[str(path.relative_to(ROOT))]=hashlib.sha256(path.read_bytes()).hexdigest()
-    inputs['app.py']=hashlib.sha256((ROOT/'app.py').read_bytes()).hexdigest()
+def run_metadata(c,p,diagnostics,run_provenance=None):
+    context=run_provenance or capture(stage='export_only')
+    validate(context)
+    if context.get('config') is not None and context['config']!=asdict(c):
+        raise ValueError('Run provenance configuration does not match this result.')
+    if context.get('physics') is not None and context['physics']!=asdict(p):
+        raise ValueError('Run provenance physics does not match this result.')
+    inputs=context['source_sha256']
     return dict(project='Diamond Atomic Clock',version=__version__,data_kind='SIMULATION',config=asdict(c),
                 physics=asdict(p),diagnostics=diagnostics,environment=environment(),source_sha256=inputs,
+                run_provenance={k:v for k,v in context.items() if k!='files'},
+                computation_source_verified=context['capture_stage']=='before_calculation' and context.get('config')==asdict(c) and context.get('physics')==asdict(p),
                 estimator='overlapping Allan deviation, no drift removal; tau <= N*dt/10',
                 sample_convention='Effective contiguous rectangular interval averages; environmental Hamiltonian evaluated at one representative value per interval',
                 scope='Conditional frequency-reference simulation with additive residual LO; no servo, Dick effect, or experimental apparatus fitted',
                 uncertainty='Any ensemble band represents only the assumed stochastic processes; parameter uncertainty not propagated')
 
 
-def export_files(trace,a,c,diagnostics,p=Physics(),quantiles=None,ensemble_raw=None):
-    meta=run_metadata(c,p,diagnostics)
+def export_files(trace,a,c,diagnostics,p=Physics(),quantiles=None,ensemble_raw=None,
+                 run_provenance=None,references=None):
+    context=run_provenance or capture(stage='export_only')
+    meta=run_metadata(c,p,diagnostics,context)
+    catalog=sources() if references is None else references
+    paper_bytes=catalog_bytes(catalog)
+    meta['reference_catalog_sha256']=hashlib.sha256(paper_bytes).hexdigest()
+    meta['reference_catalog_scope']='Includes unverified user entries; these do not change equation or parameter mappings.'
     fig=stability_figure(a,quantiles,run_label=f'N={c.n:,}; dt={c.dt_s:g} s; seed={c.seed}; bias={c.Bz_G:g} G; full assumptions in config.json')
     files={
         'timeseries_SIMULATION.csv':trace.to_csv(index=False).encode(),
@@ -116,13 +127,14 @@ def export_files(trace,a,c,diagnostics,p=Physics(),quantiles=None,ensemble_raw=N
         'parameter_provenance.csv':provenance(c,p).to_csv(index=False).encode(),
         'stability_SIMULATION.svg':figure_bytes(fig,'svg'),
         'stability_SIMULATION.pdf':figure_bytes(fig,'pdf'),
-        'sources.json':(ROOT/'references/sources.json').read_bytes(),
+        'sources.json':paper_bytes,
         'equation_map.md':(ROOT/'references/equation_map.md').read_bytes(),
-        'references.bib':(ROOT/'references/references.bib').read_bytes(),
+        'references.bib':bibtex_bytes(catalog),
         'published_benchmark_limits.csv':(ROOT/'references/benchmarks.csv').read_bytes(),
         'METHODOLOGY.md':(ROOT/'docs/METHODOLOGY.md').read_bytes(),
     }
     plt.close(fig)
+    files.update({'source_snapshot/'+name:data for name,data in context['files'].items()})
     if quantiles is not None:
         files['ensemble_quantiles_SIMULATION.csv']=quantiles.to_csv(index=False).encode()
     if ensemble_raw is not None:

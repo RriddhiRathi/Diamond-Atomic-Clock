@@ -74,3 +74,7 @@ tests/                          Numerical and dashboard validation
 docs/                           Methodology, validation and manuscript notes
 outputs/demo/                   Prepared simulated results and figures
 ```
+
+## Provenance and persistent Paper Bucket
+
+See [provenance and reference handling](docs/PROVENANCE_AND_REFERENCES.md) for source snapshots, historical checksum limitations, durable reference storage, and export verification. New CLI runs require a fresh output directory. The existing historical results are preserved unchanged.

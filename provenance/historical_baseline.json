@@ -1,0 +1,23 @@
+{
+  "baseline_commit": "d0889da26ca05ebd2d5d36d8ec27a8ea0a6f7dee",
+  "preservation": "Git blob IDs preserve the historical bytes; they do not certify existing embedded SHA256 manifests.",
+  "files": {
+    "PROJECT_SHA256SUMS.txt": "bcb91f514886f30b880fce1402ea150a9f11385c",
+    "outputs/calibration_sweep_SIMULATION.csv": "ebb31af31c715d8294035cdf8651bcf8e2c08558",
+    "outputs/demo/METHODOLOGY.md": "2ca4da56f18c456f87808e6e50a3ead554b127d9",
+    "outputs/demo/SHA256SUMS.txt": "3715d9b03f99b16210588281e301aa508241d63f",
+    "outputs/demo/allan_SIMULATION.csv": "8c2af94dab44414c7b5bcf0ffd21321fcf819a72",
+    "outputs/demo/config.json": "4bfa59351a767176399df88ed7dda29ed29a35ff",
+    "outputs/demo/ensemble_allan_SIMULATION.csv": "a759773fb9b7225fdfb2cd473e0fda6897d2fdd9",
+    "outputs/demo/ensemble_quantiles_SIMULATION.csv": "f6e8a6bda19c6d060fec7321b8fb28718099c25e",
+    "outputs/demo/equation_map.md": "f07bfc2121a0e91e4e1a13a6d78700ba92546578",
+    "outputs/demo/metadata.json": "d0841619ee7e743790e7684e965162cba8a01214",
+    "outputs/demo/parameter_provenance.csv": "294041cebda31bb9084f7f5f9f92f6f1d6dd0172",
+    "outputs/demo/published_benchmark_limits.csv": "5fc5c5fd63d7f405290538ffb765822585cce542",
+    "outputs/demo/references.bib": "bca5b5c2381ac04d4c6462d83be62c0b2d8484bb",
+    "outputs/demo/sources.json": "7d828d28512cda881c6fc528aa0cbb19ef8e7642",
+    "outputs/demo/stability_SIMULATION.pdf": "a92512e64ddd536ea312848497d3522f3ffce774",
+    "outputs/demo/stability_SIMULATION.svg": "c11ea2fcc6c0e26df5d6d6d2bc0fac4c6f463861",
+    "outputs/demo/timeseries_SIMULATION.csv": "0602c62c25ca25978620d75705f704d09af96162"
+  }
+}
