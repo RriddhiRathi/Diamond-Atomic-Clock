@@ -83,3 +83,14 @@ def test_historical_baseline_git_blobs_are_unchanged():
             ["git", "-C", str(root), "hash-object", "--path", name, name],
             text=True).strip()
         assert actual == expected, name
+
+
+def test_manifest_must_cover_every_member_and_reject_windows_paths(tmp_path):
+    digest = hashlib.sha256(b"x").hexdigest()
+    with pytest.raises(ValueError, match="every bundle member"):
+        rp.write_run_directory(tmp_path / "partial", {
+            "SHA256SUMS.txt": b"", "../unlisted": b"x"})
+    with pytest.raises(ValueError, match="Unsafe"):
+        rp.verify_files({"C:/escape": b"x", "SHA256SUMS.txt":
+                         (digest + "  C:/escape\n").encode()})
+    assert not (tmp_path / "partial").exists()

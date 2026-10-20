@@ -61,13 +61,20 @@ def validate(context, root=ROOT):
 
 
 def verify_files(files):
+    names = set()
     for line in files["SHA256SUMS.txt"].decode().splitlines():
         digest, name = line.split("  ", 1)
         path = PurePosixPath(name)
-        if path.is_absolute() or ".." in path.parts or "\\" in name:
+        if (path.is_absolute() or ".." in path.parts or "\\" in name
+                or ":" in name or name != path.as_posix()):
             raise ValueError("Unsafe checksum path.")
+        if name in names or name == "SHA256SUMS.txt":
+            raise ValueError("Duplicate or self-referential checksum entry.")
+        names.add(name)
         if name not in files or hashlib.sha256(files[name]).hexdigest() != digest:
             raise ValueError("Checksum mismatch: " + name)
+    if names != set(files) - {"SHA256SUMS.txt"}:
+        raise ValueError("Checksum manifest does not cover every bundle member.")
 
 
 def write_run_directory(folder, files):
