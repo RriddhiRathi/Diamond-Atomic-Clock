@@ -15,7 +15,7 @@ def test_clock_bundle_binds_config_tables_sources_and_user_references(tmp_path,m
     paper=store.add(dict(title='Independent reference',authors='Example',year=2026,journal='User note',url='https://example.org/clock'))
     files=export_clock(result,c,references=store.catalog());verify_files(files)
     for name in ('clock_output_SIMULATION.csv','clock_phase_boundaries_SIMULATION.csv','photon_observations_SIMULATION.csv',
-                 'feedback_SIMULATION.csv','evaluation_measurement_truth_SIMULATION.csv','clock_stability_SIMULATION.pdf',
+                 'feedback_SIMULATION.csv','evaluation_measurement_truth_SIMULATION.csv','clock_stability_SIMULATION.pdf','clock_acquisition_SIMULATION.pdf',
                  'clock_phase_time_SIMULATION.svg','source_snapshot/diamondclock/frequency_estimation.py','legacy/matlab/intern_odmr_as_supplied.m.txt'):
         assert name in files
     metadata=json.loads(files['metadata.json'])

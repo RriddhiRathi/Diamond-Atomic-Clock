@@ -7,6 +7,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from .clock_parameters import ClockExperiment
 from .clock_simulation import run_clock
+from .frequency_estimation import dip_profile
 from .clock_validation import estimator_monte_carlo,physical_estimator_cases,optical_model_comparison,counting_cases
 from .physics import Physics
 from .optical_parameters import OpticalExperiment,parameter_records
@@ -90,6 +91,27 @@ def clock_figures(result,c):
                         'axes.spines.top':False,'axes.spines.right':False}):
         foot=(f'SIMULATION | {c.optical.states} states | B={c.optical.Bz_G:g} G | seed={c.seed} | {c.plant_backend} optical dynamics\n'
               f'Gate={c.gate_s*1e3:g} ms | Ki={c.controller.integral_per_s:g}/s | latency={c.controller.latency_s*1e3:g} ms | observed lock={100*result["summary"]["observed_lock_fraction"]:.1f}% | No accuracy claim')
+        observed=tables['photon_observations'];acquisition=observed[observed.stage=='acquisition']
+        if len(acquisition):
+            acquisition=acquisition[acquisition.cycle==acquisition.cycle.iloc[0]]
+            on=acquisition[acquisition.microwave_on];off=acquisition[~acquisition.microwave_on]
+            fig,ax=plt.subplots(figsize=(8.5,5.6),layout='constrained')
+            ax.errorbar(on.probe_offset_Hz/1e6,on.detected_counts/on.nominal_gate_s/1e3,
+                yerr=np.sqrt(on.detected_counts)/on.nominal_gate_s/1e3,fmt='.',color='#2470dd',
+                elinewidth=.7,label='Detected scan counts / programmed gate')
+            ax.scatter(off.probe_offset_Hz/1e6,off.detected_counts/off.nominal_gate_s/1e3,
+                marker='x',color='#d17b16',label='Microwave-off reference gates')
+            cal=tables['acquisition'].iloc[0]
+            if cal.valid:
+                x=np.linspace(on.probe_offset_Hz.min(),on.probe_offset_Hz.max(),1200)
+                depth=dip_profile((x-cal.centre_command_Hz)/1e6,np.log(cal.width_Hz/1e6),cal.fractions,np.asarray(cal.offsets_Hz)/1e6)
+                ax.plot(x/1e6,cal.baseline_per_nominal_s*(1-depth)/1e3,color='#149ca8',label='Count-fitted empirical line family')
+                ax.axvspan(cal.lower_Hz/1e6,cal.upper_Hz/1e6,color='#149ca8',alpha=.2,label='Nominal 95% profile interval')
+            else:ax.text(.02,.05,'Acquisition rejected: '+cal.reason,transform=ax.transAxes,fontsize=9)
+            ax.set(xlabel='Commanded probe offset from controlled carrier (MHz)',ylabel='Detected rate (thousand counts/s)',
+                title='Photon-only resonance acquisition | first attempt')
+            ax.legend(fontsize=8);fig.supxlabel(foot+'\nFit uses detected counts only; physical line-shape mismatch remains possible',fontsize=7)
+            figures['clock_acquisition_SIMULATION']=fig
         stride=max(1,len(out)//3000);part=out.iloc[::stride]
         fig,(ax,bx)=plt.subplots(2,1,figsize=(8.5,6.4),layout='constrained',sharex=True)
         for name,color in [('unlocked','#999999'),('locked','#149ca8')]:
