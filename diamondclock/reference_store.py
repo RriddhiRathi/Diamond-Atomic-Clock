@@ -7,7 +7,8 @@ import uuid
 from pathlib import Path
 from urllib.parse import urlsplit
 
-ROOT = Path(__file__).resolve().parents[1]
+from .resources import project_root, default_reference_database
+ROOT = project_root()
 
 
 def curated_sources():
@@ -43,7 +44,7 @@ def normalize_doi(value):
 
 def database_path():
     return Path(os.environ.get("DIAMONDCLOCK_REFERENCE_DB",
-                               str(ROOT / "user_data/references.sqlite3")))
+                               str(default_reference_database())))
 
 
 class ReferenceStore:
