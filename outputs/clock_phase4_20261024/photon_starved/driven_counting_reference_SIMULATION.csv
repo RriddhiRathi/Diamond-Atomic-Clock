@@ -1,0 +1,3 @@
+probe_offset_Hz,gate_s,efficiency,reference_states,reference_centers,mean,variance,fano,first_mean,second_mean,covariance,interpretation
+-250000.0,0.01,0.01,7,1,115.09482604955008,115.73049309369708,1.0055229854022572,115.09482604771682,115.09640501365305,2.860619679267984e-05,Driven quantum-count moments; long clock counts remain an explicitly qualified Poisson approximation
+250000.0,0.01,0.01,7,1,115.0983913838361,115.73409180670751,1.0055231043216881,115.0983914130708,115.09284040804566,2.8669373932643794e-05,Driven quantum-count moments; long clock counts remain an explicitly qualified Poisson approximation
