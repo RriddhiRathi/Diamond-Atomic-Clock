@@ -168,5 +168,61 @@
     "locator": "legacy/matlab/README.md; supplied transcript",
     "implementation": "diamondclock/odmr.py; corrected Python adaptation",
     "note": "Received 2026-10-24; original creation date unknown. Whitespace normalized; no executable original .m file or license supplied. Original authorship is not claimed by the Python integration."
+  },
+  {
+    "id": "TET2012",
+    "title": "Magnetic-field-dependent photodynamics of single NV defects in diamond: an application to qualitative all-optical magnetic imaging",
+    "authors": "J.-P. Tetienne et al.",
+    "year": 2012,
+    "journal": "New Journal of Physics 14, 103033",
+    "doi": "10.1088/1367-2630/14/10/103033",
+    "url": "https://inspirehep.net/files/5a17933cdfcb28c712d40c257f48efcc",
+    "evidence": "Peer-reviewed optical-cycle/measurement study; project data remain simulated",
+    "verified": "2026-10-24",
+    "locator": "Published version: Sec.2.1 Eqs.(1)-(5); Table 1 printed p.9, NV E; Fig.3(c) printed p.8",
+    "implementation": "diamondclock/optical_*.py; diamondclock/photon_detection.py; references/optical_equation_map.md",
+    "note": "Fitted rates are for the published NV E defect, not universal constants. Uncertainties stored, not propagated. No experimental fit in this project."
+  },
+  {
+    "id": "ROB2011",
+    "title": "Spin dynamics in the optical cycle of single nitrogen-vacancy centres in diamond",
+    "authors": "L. Robledo, H. Bernien, T. van der Sar, R. Hanson",
+    "year": 2011,
+    "journal": "New Journal of Physics 13, 025013",
+    "doi": "10.1088/1367-2630/13/2/025013",
+    "url": "https://arxiv.org/pdf/1010.1192",
+    "evidence": "Peer-reviewed optical-cycle/measurement study; project data remain simulated",
+    "verified": "2026-10-24",
+    "locator": "Accessible arXiv v1: Secs.3-6; five-level lumping of +/-1; published DOI metadata checked",
+    "implementation": "diamondclock/optical_*.py; diamondclock/photon_detection.py; references/optical_equation_map.md",
+    "note": "Independent context for lifetime/ISC mechanism. This paper uses a five-level lumping; do not call it our seven-state derivation or mix its rates into Tetienne NV E."
+  },
+  {
+    "id": "HIN2018",
+    "title": "Statistical inference with quantum measurements: methodologies for nitrogen vacancy centers in diamond",
+    "authors": "I. Hincks, C. Granade, D. G. Cory",
+    "year": 2018,
+    "journal": "New Journal of Physics 20, 013022",
+    "doi": "10.1088/1367-2630/aa9c9f",
+    "url": "https://arxiv.org/pdf/1705.10897",
+    "evidence": "Peer-reviewed optical-cycle/measurement study; project data remain simulated",
+    "verified": "2026-10-24",
+    "locator": "Accessible arXiv v1: Secs.II-III, Eqs.(5)-(13),(20)-(30); published DOI metadata checked",
+    "implementation": "diamondclock/optical_*.py; diamondclock/photon_detection.py; references/optical_equation_map.md",
+    "note": "Jump operators, restricted rate reduction, photon loss/dark-count approximation. Poisson detection is qualified against number-resolved reference; not exact single-emitter statistics."
+  },
+  {
+    "id": "PAN2024",
+    "title": "Photon-emission statistics for single nitrogen-vacancy centers",
+    "authors": "I. Panadero et al.",
+    "year": 2024,
+    "journal": "Physical Review Applied 22, 014035",
+    "doi": "10.1103/PhysRevApplied.22.014035",
+    "url": "https://arxiv.org/pdf/2307.02854",
+    "evidence": "Peer-reviewed optical-cycle/measurement study; project data remain simulated",
+    "verified": "2026-10-24",
+    "locator": "Accessible arXiv v1 (different title: Characterization of the photon emission statistics in nitrogen-vacancy centers): Sec.II, Eqs.(3)-(4), number-resolved photon counting; journal metadata checked",
+    "implementation": "diamondclock/optical_*.py; diamondclock/photon_detection.py; references/optical_equation_map.md",
+    "note": "Architecture reference only; numerical coefficients and Rabi conventions are not copied. Published experimental support applies to that experiment, not this extension."
   }
 ]

@@ -1,0 +1,8 @@
+index,manifold,energy_Hz,bare_overlap_0,bare_overlap_1,bare_overlap_2
+0,ground_eigenstate,0.0,0.0,1.0,0.0
+1,ground_eigenstate,2814214000.0,0.0,0.0,1.0
+2,ground_eigenstate,2926346000.0,1.0,0.0,0.0
+3,excited_bare,,,,
+4,excited_bare,,,,
+5,excited_bare,,,,
+6,effective_singlet,,,,

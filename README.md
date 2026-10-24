@@ -108,3 +108,29 @@ The example uses the intern's nominal 18 G geometry; the paired clock comparison
 uses the separately recorded clock bias, normally 475 G.
 
 Validation and example results: [ODMR_VALIDATION.md](docs/ODMR_VALIDATION.md).
+
+## Phase 3: optical excitation and photon measurements
+
+The existing app now has an **Optical measurement** tab. The seven-state Lindblad
+reference simulates laser pumping, spin-dependent ISC, singlet shelving, radiative
+emission and coherent GHz microwave driving. The 21-state extension uses the
+unchanged nitrogen-14 ground Hamiltonian with explicitly secular optical channels.
+Contrast is calculated from populations/counts. Fast Poisson scans and a
+number-resolved photon-counting reference are separately labeled.
+
+```bash
+python scripts/run_optical.py --states 7 --out outputs/my_optical_7
+python scripts/run_optical.py --states 21 --out outputs/my_optical_21
+python scripts/run_optical.py --config examples/optical_21.json --out outputs/my_optical_config
+```
+
+Each output folder must be new. Bundles include expected and sampled counts, all
+optical populations, acquisition timing/seeds, initialization traces, reference
+count distributions/trials, solver benchmarks, provenance and vector SVG/PDF plots.
+Paper Bucket entries distinguish published fitted rates from operating assumptions.
+Only local axial 5–50 G, E=0 and nominal 297 K are supported by this phase; **475 G
+is rejected**. This is simulated data, with no fit to apparatus and no clock servo.
+Read [optical methods](docs/OPTICAL_METHODS.md), [validation](docs/OPTICAL_VALIDATION.md)
+and the [equation map](references/optical_equation_map.md). Existing clock/ODMR
+features and the original intern MATLAB attribution archive are retained. No
+Streamlit redeployment is part of Phase 3.

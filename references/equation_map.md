@@ -20,3 +20,9 @@ Every numerical parameter carries units, source ID, locator and assumption notes
 The original M1-M8 mapping remains above. The additive spectroscopy and optional
 readout bridge are mapped in [odmr_equation_map.md](odmr_equation_map.md), with full
 units, assumptions and attribution in [ODMR_METHODS.md](../docs/ODMR_METHODS.md).
+
+## Phase 3 optical measurement
+
+The additional optical equations, published fitted rates, detector assumptions and
+21-state extension are mapped in `references/optical_equation_map.md` and documented
+in `docs/OPTICAL_METHODS.md`. Existing clock equations and inputs are unchanged.

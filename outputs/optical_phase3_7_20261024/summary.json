@@ -1,0 +1,60 @@
+{
+  "data_kind": "SIMULATION",
+  "experimental_validation": false,
+  "expected_maximum_grid_contrast": 0.1245271609998091,
+  "grid_maximum_is_not_fitted_resonance": true,
+  "lifetime_zero_ns": 13.698630136986301,
+  "lifetime_pm_ns": 8.56898029134533,
+  "singlet_lifetime_ns": 526.3157894736842,
+  "counting_reference": [
+    {
+      "scenario": 0,
+      "optical": {
+        "states": 7,
+        "Bz_G": 20.0,
+        "temperature_K": 297.0,
+        "pump_s": 2000000.0,
+        "rabi_Hz": 0,
+        "pure_dephasing_s": 100000.0,
+        "ground_pair_s": 1000.0
+      },
+      "centers": 1,
+      "efficiency": 0.01,
+      "gate_s": 2e-05,
+      "background_s": 0,
+      "dark_s": 0,
+      "repetitions": 4096,
+      "seed": 3468654882,
+      "expected_counts": 0.25587915338812933,
+      "variance": 0.2574648821191122,
+      "fano": 1.006197178277269
+    },
+    {
+      "scenario": 1,
+      "optical": {
+        "states": 7,
+        "Bz_G": 20.0,
+        "temperature_K": 297.0,
+        "pump_s": 2000000.0,
+        "rabi_Hz": 0,
+        "pure_dephasing_s": 100000.0,
+        "ground_pair_s": 1000.0
+      },
+      "centers": 1,
+      "efficiency": 1.0,
+      "gate_s": 1e-06,
+      "background_s": 0,
+      "dark_s": 0,
+      "repetitions": 4096,
+      "seed": 3565763911,
+      "expected_counts": 1.279395766940652,
+      "variance": 1.5033008664132046,
+      "fano": 1.1750084729512311
+    }
+  ],
+  "scope": "Single NV orientation, local axial 5..50 G, E=0, nominal 297 K. No 475 G support; no clock lock.",
+  "rate_backend": "Steady Bloch-coherence elimination; compare with Lindblad, not identical in general",
+  "extension": "21-state independent optical channels in ground eigenbasis; excited/singlet nuclear dynamics omitted",
+  "preparation": "CW gates begin in individual stationary states; initialization dataset is separate; preparation overhead excluded",
+  "uncertainty": "Published rate uncertainties retained, not propagated; no fit to user apparatus or experimental dataset"
+}

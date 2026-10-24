@@ -1,0 +1,4 @@
+microwave_frequency_Hz,states,maximum_population_error,master_emitted_s,rate_emitted_s,interpretation
+2924146000.0,21,1.5082593655957391e-06,1212852.5866770325,1212854.7487225072,Selected settings only; no certification of all scan frequencies
+2926346000.0,21,2.630270162506961e-07,1215973.6060248166,1215973.9195509704,Selected settings only; no certification of all scan frequencies
+2928546000.0,21,1.086900257768476e-06,1222649.568474263,1222648.0757147938,Selected settings only; no certification of all scan frequencies

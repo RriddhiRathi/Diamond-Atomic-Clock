@@ -1,0 +1,29 @@
+{
+  "optical": {
+    "states": 21,
+    "Bz_G": 20.0,
+    "temperature_K": 297.0,
+    "pump_s": 2000000.0,
+    "rabi_Hz": 200000.0,
+    "pure_dephasing_s": 100000.0,
+    "ground_pair_s": 1000.0
+  },
+  "rates": {
+    "radiative_s": 63700000.0,
+    "isc_zero_s": 9300000.0,
+    "isc_pm_s": 53000000.0,
+    "singlet_zero_s": 900000.0,
+    "singlet_pm_s": 500000.0
+  },
+  "detector": {
+    "efficiency": 0.01,
+    "centers": 100,
+    "background_s": 1000.0,
+    "dark_s": 100.0
+  },
+  "points": 81,
+  "span_Hz": 6000000.0,
+  "dwell_s": 0.001,
+  "seed": 310024,
+  "backend": "lindblad"
+}
