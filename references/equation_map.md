@@ -14,3 +14,9 @@
 | Paired calibration-error sweep (M8) | MODEL: parameter experiment using shared seed | `scripts/sensitivity_sweep.py` |
 
 Every numerical parameter carries units, source ID, locator and assumption notes in the dashboard parameter table and `parameter_provenance.csv`. Spin matrices and eigensystem tracking are numerical linear algebra. Display styling and plot sampling are presentation choices.
+
+## ODMR extension
+
+The original M1-M8 mapping remains above. The additive spectroscopy and optional
+readout bridge are mapped in [odmr_equation_map.md](odmr_equation_map.md), with full
+units, assumptions and attribution in [ODMR_METHODS.md](../docs/ODMR_METHODS.md).

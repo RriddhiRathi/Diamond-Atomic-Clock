@@ -78,3 +78,33 @@ outputs/demo/                   Prepared simulated results and figures
 ## Provenance and persistent Paper Bucket
 
 See [provenance and reference handling](docs/PROVENANCE_AND_REFERENCES.md) for source snapshots, historical checksum limitations, durable reference storage, and export verification. New CLI runs require a fresh output directory. The existing historical results are preserved unchanged.
+
+## Integrated ODMR spectroscopy
+
+Open the **ODMR spectroscopy** tab in the same dashboard. Adjust magnetic/electric
+fields, microwave polarization, temperature, FWHM and orientation weights, then
+select **Calculate ODMR**. Inspect all four spectra, their weighted ensemble,
+energy ranks and magnetic gradients. The existing clock tabs remain available.
+
+An optional comparison uses the current clock sidebar bias and replaces only
+its assumed electronic readout sigma with an ideal resolved-line photon-noise
+estimate. It is a conditional scenario, not a new accuracy or stability measurement.
+Line contrast, rate and linewidth must be supplied; overlapping lines and correlated
+readout are rejected for this isolated-line estimate. See
+[ODMR methodology](docs/ODMR_METHODS.md) and the
+[equation-to-code map](references/odmr_equation_map.md).
+
+Reproduce a research bundle in a NEW directory:
+
+```powershell
+python scripts/run_odmr.py --config examples/odmr_intern_geometry.json --readout-config examples/odmr_readout.json --compare --samples 4096 --out outputs/odmr-new-run
+```
+
+Exports include CSV spectra, transitions, level sweeps, sensitivities, paired clock
+records and Allan curves, SVG/PDF figures, source snapshots, configuration,
+references and checksums. The supplied intern MATLAB transcript is retained under
+[legacy/matlab](legacy/matlab/README.md); original authorship is acknowledged there.
+The example uses the intern's nominal 18 G geometry; the paired clock comparison
+uses the separately recorded clock bias, normally 475 G.
+
+Validation and example results: [ODMR_VALIDATION.md](docs/ODMR_VALIDATION.md).

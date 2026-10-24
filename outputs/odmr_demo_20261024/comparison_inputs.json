@@ -1,0 +1,89 @@
+{
+  "original_config": {
+    "n": 4096,
+    "dt_s": 1.0,
+    "seed": 20261019,
+    "Bz_G": 475.0,
+    "Bx_G": 0.0,
+    "temp_rms_K": 0.05,
+    "temp_corr_s": 300.0,
+    "temp_sine_K": 0.1,
+    "temp_period_s": 7200.0,
+    "temp_drift_K_h": 0.002,
+    "Bz_rms_G": 0.001,
+    "Bx_rms_G": 0.0001,
+    "B_corr_s": 100.0,
+    "electron_readout_Hz": 50.0,
+    "nuclear_readout_Hz": 0.03,
+    "readout_rho": 0.0,
+    "thermometer_rms_K": 0.001,
+    "thermometer_delay_s": 0.0,
+    "slope_error_pct": 1.0,
+    "lo_white_adev_1s": 1e-09,
+    "lo_rw_diffusion": 1e-11,
+    "lo_drift_per_s": 0.0
+  },
+  "informed_config": {
+    "n": 4096,
+    "dt_s": 1.0,
+    "seed": 20261019,
+    "Bz_G": 475.0,
+    "Bx_G": 0.0,
+    "temp_rms_K": 0.05,
+    "temp_corr_s": 300.0,
+    "temp_sine_K": 0.1,
+    "temp_period_s": 7200.0,
+    "temp_drift_K_h": 0.002,
+    "Bz_rms_G": 0.001,
+    "Bx_rms_G": 0.0001,
+    "B_corr_s": 100.0,
+    "electron_readout_Hz": 10886.621079036348,
+    "nuclear_readout_Hz": 0.03,
+    "readout_rho": 0.0,
+    "thermometer_rms_K": 0.001,
+    "thermometer_delay_s": 0.0,
+    "slope_error_pct": 1.0,
+    "lo_white_adev_1s": 1e-09,
+    "lo_rw_diffusion": 1e-11,
+    "lo_drift_per_s": 0.0
+  },
+  "readout_scenario": {
+    "linewidth_Hz": 300000.0,
+    "line_contrast": 0.03,
+    "photon_rate_per_s": 1000000.0,
+    "duty_fraction": 1.0
+  },
+  "diagnostics": {
+    "per_line_sigma_at_1s_Hz": 10886.621079036348,
+    "original_per_line_sigma_at_1s_Hz": 50.0,
+    "isolation_checks": [
+      {
+        "line": "f_plus",
+        "frequency_Hz": 4199683960.4212384,
+        "nearest_other_line_Hz": 2171364.3975815773
+      },
+      {
+        "line": "f_minus",
+        "frequency_Hz": 1540883861.3597746,
+        "nearest_other_line_Hz": 2160688.6469688416
+      }
+    ],
+    "clock_frame_B_G": [
+      0.0,
+      0,
+      475.0
+    ],
+    "electric_field_V_m": [
+      0,
+      0,
+      0
+    ],
+    "geometry": "Single NV clock frame; not a lock to the four-orientation ensemble minimum",
+    "changed_fields": [
+      "electron_readout_Hz"
+    ],
+    "assumptions": "DRE2011 Eq. (3), low contrast, two resolved Lorentzian lines, half live time per line, ideal maximum-slope independent photon detection. Line contrast supplied, not inferred from spectrum proxy. No claim about apparatus accuracy."
+  },
+  "estimator": "Existing overlapping Allan deviation; no drift removal; tau <= N dt / 10",
+  "interpretation": "Paired stochastic realization, not ensemble confidence intervals. Only electronic readout sigma changes."
+}

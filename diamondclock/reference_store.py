@@ -14,12 +14,18 @@ def curated_sources():
     rows = json.loads((ROOT / "references/sources.json").read_text(encoding="utf-8"))
     for row in rows:
         row["verification_status"] = (
+            "implementation_archive" if row.get("record_type")=="implementation_archive" else
+            "metadata_only" if row.get("verification_scope")=="metadata_only" else
             "model_assumption" if row["id"] == "MODEL" else "curated_record")
         row["verification_origin"] = "repository"
     return rows
 
 
 def verification_label(row):
+    if row.get("verification_status") == "implementation_archive":
+        return "Original user-supplied implementation archive; not peer-reviewed evidence"
+    if row.get("verification_status") == "metadata_only":
+        return "Bibliographic metadata checked; original numerical text not independently verified"
     if row.get("verification_status") == "model_assumption":
         return "Model assumption / numerical method; not a publication"
     if row.get("verification_status") == "curated_record":

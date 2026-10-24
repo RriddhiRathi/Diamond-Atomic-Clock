@@ -27,3 +27,10 @@ Run locally:
 ```powershell
 .\.venv\Scripts\python.exe -m pytest -q
 ```
+
+## Subsequent integration checks (2026-10-24)
+
+The preceding 16-test record is historical. The provenance branch subsequently
+passed 33 tests on Ubuntu and Windows. The additive ODMR integration expands the
+suite to 56 tests; see [ODMR_VALIDATION.md](ODMR_VALIDATION.md) for scope and the PR
+workflow for platform results. Historical baseline files remain unchanged.
