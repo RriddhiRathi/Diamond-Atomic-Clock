@@ -21,7 +21,7 @@ class _ExperimentClock:
     """Private ideal-time integrator with LO-derived gate/latency deadlines."""
     def __init__(self,c,plant,f0,free,photon_seed):
         self.c=c;self.plant=plant;self.f0=f0;self.free=free;self.rng=np.random.default_rng(photon_seed)
-        self.t=0.;self.local=0.;self.index=0;self.u=0.;self.integral=0.;self.correction_integral=0.
+        self.t=0.;self.local=0.;self.index=0;self.u=0.;self.integral=0.;self.correction_integral=0.;self.total_frequency_integral=0.
         self.queue=[];self.serial=0;self.events=[];self.observed=[];self.truth=[];self.output=[];self.status='ACQUIRING'
 
     def request(self,command,cycle):
@@ -50,6 +50,7 @@ class _ExperimentClock:
             det=self.c.detector
             mean+=det.efficiency*det.centers*emitted+(det.background_s+det.dark_s)*h
             self.integral+=f*h;self.correction_integral+=self.u*h
+            self.total_frequency_integral+=f*h
             self.t+=h;self.local+=ratio*h
             if self.t>=next_boundary-1e-12:
                 deviation=self.integral/self.c.native_dt_s
@@ -61,14 +62,16 @@ class _ExperimentClock:
 
     def measure(self,probe,enabled,stage,cycle):
         self.advance(self.c.settling_s,probe,enabled)
-        start=self.t;local=self.local
+        start=self.t;local=self.local;integral_start=self.total_frequency_integral
         mean=self.advance(self.c.gate_s,probe,enabled)
         counts=int(self.rng.poisson(mean))
         observation=CountObservation(float(probe),self.c.gate_s,counts,bool(enabled),local)
         ident=len(self.observed)
         self.observed.append(dict(observation_id=ident,stage=stage,cycle=cycle,**asdict(observation)))
         self.truth.append(dict(observation_id=ident,true_start_s=start,true_end_s=self.t,
-            actual_duration_s=self.t-start,expected_counts=mean,**self.plant.population_summary()))
+            actual_duration_s=self.t-start,expected_counts=mean,
+            mean_carrier_deviation_Hz=(self.total_frequency_integral-integral_start)/(self.t-start),
+            **self.plant.population_summary()))
         return observation
 
 
@@ -90,7 +93,7 @@ def run_clock(c=ClockExperiment(),p=Physics()):
                 batch=[engine.measure(0.,False,'acquisition',cycle)]
                 batch += [engine.measure(float(x),True,'acquisition',cycle) for x in np.linspace(-c.acquisition_span_Hz,c.acquisition_span_Hz,c.acquisition_points)]
                 batch.append(engine.measure(0.,False,'acquisition',cycle))
-                offsets=(0.,)  # first validate the seven-electronic-state lock
+                offsets=(0.,) if c.optical.states==7 else (-abs(p.Apar0_Hz),0.,abs(p.Apar0_Hz))
                 cal=fit_acquisition(batch,offsets)
                 acquisitions.append(dict(attempt=attempts,cycle=cycle,local_end_s=engine.local,**asdict(cal)))
                 if cal.valid:
@@ -121,32 +124,64 @@ def run_clock(c=ClockExperiment(),p=Physics()):
     except ClockTimeLimit:timed_out=True
     output=pd.DataFrame(engine.output)
     if len(output)<20:raise ValueError('Record too short for clock stability analysis.')
-    allan=[]
+    allan=[];fixed_allan=[];boundaries={'time_s':np.arange(len(output)+1)*c.native_dt_s}
     for name in ('locked','unlocked'):
         delta=output[name+'_deviation_Hz'].to_numpy()
         phase,time_error=phase_and_time(delta,c.native_dt_s,f0)
         output[name+'_y']=delta/f0;output[name+'_phase_error_rad']=phase[:-1]
         output[name+'_time_error_s']=time_error[:-1]
+        output[name+'_frequency_Hz']=f0+delta
+        boundaries[name+'_phase_error_rad']=phase;boundaries[name+'_time_error_s']=time_error
+        boundaries[name+'_unwrapped_phase_rad']=2*np.pi*f0*boundaries['time_s']+phase
         a=overlapping_adev(delta/f0,c.native_dt_s);a['method']=name;allan.append(a)
+        window=output.time_s.to_numpy()>=c.fixed_analysis_start_s
+        if window.sum()>=20:
+            a=overlapping_adev(delta[window]/f0,c.native_dt_s);a['method']=name
+            a['fixed_start_s']=c.fixed_analysis_start_s;fixed_allan.append(a)
     e=plant.system.ground_energies_Hz;u=plant.system.ground_vectors
     bare,order=linear_sum_assignment(-abs(u)**2);order=order[np.argsort(bare)]
-    reference=e[order[0]]-e[order[1]]  # offline seven-state target only
+    ni=plant.system.ni
+    reference=e[order[ni//2]]-e[order[ni+ni//2]]  # offline target: m_I=0 for 14N
     output['evaluation_error_to_hamiltonian_Hz']=f0+output.locked_deviation_Hz-reference
     for name in ('locked','unlocked'):
-        last=output[name+'_deviation_Hz'].iloc[-1]
         # Endpoint values are separate from interval-start phase/time columns.
         output.attrs[name+'_final_phase_error_rad']=float(2*np.pi*output[name+'_deviation_Hz'].sum()*c.native_dt_s)
         output.attrs[name+'_final_time_error_s']=output.attrs[name+'_final_phase_error_rad']/(2*np.pi*f0)
     tables=dict(clock_output=output,photon_observations=pd.DataFrame(engine.observed),
-        feedback=pd.DataFrame(feedback),actuation=pd.DataFrame(engine.events),
+        feedback=pd.DataFrame(feedback),actuation=pd.DataFrame(engine.events,columns=['cycle','request_id','applied_local_s','applied_true_s','deadline_local_s','correction_Hz']),
         evaluation_measurement_truth=pd.DataFrame(engine.truth),acquisition=pd.DataFrame(acquisitions),
         allan=pd.concat(allan,ignore_index=True))
+    tables['clock_phase_boundaries']=pd.DataFrame(boundaries)
+    tables['allan_fixed_window']=pd.concat(fixed_allan,ignore_index=True) if fixed_allan else pd.DataFrame(columns=['tau_s','adev','overlapping_pairs','m','method','fixed_start_s'])
+    # Offline only: never exposed to the estimator/controller or used to select locks.
+    truth=tables['evaluation_measurement_truth'].merge(tables['photon_observations'][['observation_id','stage','cycle','microwave_on']],on='observation_id')
+    evaluation=[]
+    for row in feedback:
+        gates=truth[(truth.cycle==row['cycle']) & (truth.stage=='tracking') & truth.microwave_on]
+        if len(gates)==0 or 'detuning_Hz' not in row:continue
+        weights=gates.actual_duration_s.to_numpy()
+        true_error=float(np.average(f0+gates.mean_carrier_deviation_Hz-reference,weights=weights))
+        midpoint=float(np.average((gates.true_start_s+gates.true_end_s)/2,weights=weights))
+        evaluation.append(dict(cycle=row['cycle'],true_midpoint_s=midpoint,
+            mean_gate_hamiltonian_detuning_Hz=true_error,estimated_detuning_Hz=row['detuning_Hz'],
+            estimator_error_Hz=row['detuning_Hz']-true_error,reported_sigma_Hz=row['sigma_Hz'],valid=row['valid'],
+            covered=row['lower_Hz']<=true_error<=row['upper_Hz'],
+            definition='Duration-weighted MW-on carrier vs Hamiltonian target; includes line pulling and within-cycle approximation'))
+    tables['evaluation_tracking_error']=pd.DataFrame(evaluation,columns=['cycle','true_midpoint_s','mean_gate_hamiltonian_detuning_Hz',
+        'estimated_detuning_Hz','estimator_error_Hz','reported_sigma_Hz','valid','covered','definition'])
     diagnostics=dict(data_kind='SIMULATION',experimental_validation=False,nominal_Hz=f0,
         evaluation_hamiltonian_reference_Hz=float(reference),lo_seed=lo_seed,photon_seed=photon_seed,
-        timed_out=timed_out,acquisitions=attempts,record_s=len(output)*c.native_dt_s,
+        timed_out=timed_out,acquisitions=attempts,completed_cycles=len(feedback),record_s=len(output)*c.native_dt_s,
         observed_lock_fraction=float(np.mean([v.get('locked',False) for v in feedback])),
         final_time_errors_s={name:output.attrs[name+'_final_time_error_s'] for name in ('locked','unlocked')},
         optical_trace_roundoff_max=plant.last_normalization_error,
         uncertainty='Count-only profile intervals plus first-order independent calibration-shape covariance; coverage tested, not guaranteed.',
         scope='Low-field single-transition NV-referenced LO. No SI accuracy claim or 475 G optical validation.')
+    evaluated=tables['evaluation_tracking_error']
+    good=evaluated[(evaluated.valid==True)&(evaluated.true_midpoint_s>=c.fixed_analysis_start_s)]
+    diagnostics['fixed_window_tracking_evaluation']=dict(start_s=c.fixed_analysis_start_s,accepted=len(good),
+        bias_Hz=float(good.estimator_error_Hz.mean()) if len(good) else None,
+        rmse_Hz=float(np.sqrt(np.mean(good.estimator_error_Hz**2))) if len(good) else None,
+        empirical_interval_coverage=float(good.covered.mean()) if len(good) else None,
+        interpretation='Offline check against gate-averaged Hamiltonian detuning; not fed back or bias-corrected')
     return tables,diagnostics

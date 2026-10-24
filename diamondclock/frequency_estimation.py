@@ -83,7 +83,7 @@ def estimate_detuning(observations,calibration,capture_Hz=450e3):
     Their empirical coverage must be assessed; neither is guaranteed at sparse counts.
     """
     x,t,n,on=_arrays(observations);c=calibration;cap=capture_Hz/1e6
-    invalid=lambda why:FrequencyEstimate(0.,float('inf'),-float('inf'),float('inf'),
+    invalid=lambda why:FrequencyEstimate(float('nan'),float('inf'),-float('inf'),float('inf'),
         -float('inf'),float('inf'),False,why,0.)
     if not c.valid:return invalid('invalid_calibration')
     if n.sum()<20 or not np.any(~on) or not np.any(on):return invalid('insufficient_observations')

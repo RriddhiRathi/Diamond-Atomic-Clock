@@ -18,7 +18,7 @@ def test_controller_sign_integral_gain_and_antiwindup():
 
 def test_deterministic_zero_delay_integrator_stability_and_failure():
     for gain,should_shrink in [(.3,True),(2.5,False)]:
-        ctl=PhotonController(ControllerConfig(integral_per_s=gain,correction_limit_Hz=1e12)) if False else PhotonController(ControllerConfig(integral_per_s=gain))
+        ctl=PhotonController(ControllerConfig(integral_per_s=gain))
         u=0.;errors=[]
         for _ in range(8):
             error=100+u;errors.append(abs(error));u=ctl.update(estimate(error),1.)

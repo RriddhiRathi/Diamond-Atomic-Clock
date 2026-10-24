@@ -134,3 +134,39 @@ Read [optical methods](docs/OPTICAL_METHODS.md), [validation](docs/OPTICAL_VALID
 and the [equation map](references/optical_equation_map.md). Existing clock/ODMR
 features and the original intern MATLAB attribution archive are retained. No
 Streamlit redeployment is part of Phase 3.
+
+## Phase 4: photon-based frequency locking
+
+Install from the project root (including Windows/VS Code):
+
+```bash
+python -m pip install -e ".[dev]"
+python -m pytest -q
+```
+
+Editable package discovery is explicit. The installed `diamondclock-clock` command
+also works outside the checkout; wheel installs include scientific assets/source
+snapshots. In the same Streamlit app, the **Frequency lock** tab adds count-only
+acquisition, uncertainty, a causal latency-queued PI loop, oscillator phase/time
+error and output-based Allan deviation. Nothing is automatically deployed.
+
+```bash
+python scripts/run_clock.py --states 7 --cycles 512 --validation-trials 100 --physical-trials 40 --out outputs/NEW_CLOCK7
+python scripts/run_clock.py --states 21 --cycles 512 --out outputs/NEW_CLOCK21
+python scripts/run_clock.py --scenario high-gain --cycles 256 --out outputs/NEW_UNSTABLE
+python scripts/run_clock.py --scenario latency --cycles 256 --out outputs/NEW_LATENCY
+python scripts/run_clock.py --scenario photon-starved --cycles 128 --out outputs/NEW_LOW_COUNTS
+```
+
+Use `--config examples/clock_7.json` (or `clock_21.json`) for exact demonstration
+inputs. Every output path must be new. Existing optical and legacy stability runs
+are unchanged. The seven-state long-run plant is the Lindblad reference; the
+21-state CLI default uses the finite-time-benchmarked rate reduction and assumes
+1000 independent centers/linear detection. No locking or stability improvement is
+guaranteed. Full records and a predeclared fixed evaluation window are both retained.
+Read [clock methods](docs/CLOCK_METHODS.md) and [validation](docs/CLOCK_VALIDATION.md).
+
+Scope remains local axial 5–50 G, E=0, 297 K; **475 G is rejected**. Synthetic
+counts, fitted optical parameters and controller/noise assumptions are distinguished
+in the Paper Bucket. This is an NV-referenced oscillator simulation, not an
+experimental accuracy claim or a validated 475 G composite clock.

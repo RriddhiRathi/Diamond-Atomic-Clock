@@ -8,6 +8,7 @@ class PhotonController:
         config.validate();self.config=config;self.integrator=0.;self.good=0;self.bad=0;self.locked=False
 
     def acquired(self,command_Hz):
+        if self.config.proportional==0 and self.config.integral_per_s==0:command_Hz=0.
         self.integrator=float(np.clip(command_Hz,-self.config.correction_limit_Hz,self.config.correction_limit_Hz))
         self.good=0;self.bad=0;self.locked=False
         return self.integrator

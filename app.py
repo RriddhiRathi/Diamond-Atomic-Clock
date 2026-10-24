@@ -97,7 +97,7 @@ cols[2].metric('Electronic / composite ADEV',f'{base/target.adev:.2f}×' if targ
 cols[3].metric('Composite nuclear weight',f'{diag["wQ"]:.4f}')
 st.caption('Smaller Allan deviation means less change in the average ticking rate between neighboring averaging windows. A ratio below 1 means the composite is worse at the displayed averaging time.')
 
-tabs=st.tabs(['Stability lab','Environment & transitions','Compensation study','NV center explained','Research Paper Bucket','Export & methodology','ODMR spectroscopy','Optical measurement'])
+tabs=st.tabs(['Stability lab','Environment & transitions','Compensation study','NV center explained','Research Paper Bucket','Export & methodology','ODMR spectroscopy','Optical measurement','Frequency lock'])
 
 with tabs[0]:
     st.subheader('Frequency stability across averaging time')
@@ -274,3 +274,8 @@ with tabs[6]:
 with tabs[7]:
     from diamondclock.optical_dashboard import render_optical
     render_optical(fingerprint,paper_bucket,reference_error)
+
+
+with tabs[8]:
+    from diamondclock.clock_dashboard import render_clock
+    render_clock(fingerprint,paper_bucket,reference_error)

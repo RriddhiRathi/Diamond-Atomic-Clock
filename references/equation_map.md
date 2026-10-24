@@ -26,3 +26,9 @@ units, assumptions and attribution in [ODMR_METHODS.md](../docs/ODMR_METHODS.md)
 The additional optical equations, published fitted rates, detector assumptions and
 21-state extension are mapped in `references/optical_equation_map.md` and documented
 in `docs/OPTICAL_METHODS.md`. Existing clock equations and inputs are unchanged.
+
+## Phase 4 frequency lock
+
+See `references/clock_equation_map.md` and `docs/CLOCK_METHODS.md` for photon-based
+frequency estimation, oscillator/feedback timing and actual-output Allan analysis.
+The existing conditional stability model is retained separately.

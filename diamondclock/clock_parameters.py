@@ -43,15 +43,14 @@ class ClockExperiment:
     acquisition_span_Hz: float = 4e6
     dither_Hz: float = 250e3
     maximum_time_s: float = 120.
+    fixed_analysis_start_s: float = 2.  # predeclared offline window; never selected from truth
     seed: int = 410024
     reference_offset_Hz: float = -35e3  # plant-only sample shift; never passed to inference
     plant_backend: str = 'lindblad'
 
     def validate(self):
         for obj in (self.optical,self.rates,self.detector,self.oscillator,self.controller):obj.validate()
-        # The seven-state end-to-end implementation is validated before removing this guard.
-        if self.optical.states!=7:raise ValueError('Seven-state clock validation comes first.')
-        for key in ('native_dt_s','gate_s','settling_s','acquisition_span_Hz','dither_Hz','maximum_time_s','reference_offset_Hz'):
+        for key in ('native_dt_s','gate_s','settling_s','acquisition_span_Hz','dither_Hz','maximum_time_s','reference_offset_Hz','fixed_analysis_start_s'):
             if not np.isfinite(getattr(self,key)):raise ValueError('Nonfinite protocol value.')
         if not .0001<=self.native_dt_s<=.01 or not .001<=self.gate_s<=.1 or self.native_dt_s>self.gate_s:
             raise ValueError('Use native dt 0.1..10 ms <= gate, and gates 1..100 ms.')
@@ -61,6 +60,7 @@ class ClockExperiment:
             raise ValueError('Use 4..4096 cycles and 31..201 acquisition points.')
         if not 3e6<=self.acquisition_span_Hz<=8e6 or not 2<=self.maximum_time_s<=1800 or abs(self.reference_offset_Hz)>1e6:
             raise ValueError('Protocol exceeds the declared simulation window.')
+        if self.fixed_analysis_start_s<0:raise ValueError('Analysis window start cannot be negative.')
         if not isinstance(self.seed,int) or isinstance(self.seed,bool) or self.seed<0:raise ValueError('Nonnegative integer seed required.')
         if self.detector.efficiency>.02 or self.optical.pump_s<.1e6:
             raise ValueError('Long clock uses qualified low-efficiency Poisson counts and pump >=0.1 million/s.')

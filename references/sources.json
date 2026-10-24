@@ -224,5 +224,47 @@
     "locator": "Accessible arXiv v1 (different title: Characterization of the photon emission statistics in nitrogen-vacancy centers): Sec.II, Eqs.(3)-(4), number-resolved photon counting; journal metadata checked",
     "implementation": "diamondclock/optical_*.py; diamondclock/photon_detection.py; references/optical_equation_map.md",
     "note": "Architecture reference only; numerical coefficients and Rabi conventions are not copied. Published experimental support applies to that experiment, not this extension."
+  },
+  {
+    "id": "PEIK2006",
+    "title": "Laser frequency stabilization to a single ion",
+    "authors": "E. Peik, T. Schneider, C. Tamm",
+    "year": 2006,
+    "journal": "Journal of Physics B 39, 145",
+    "doi": "10.1088/0953-4075/39/1/012",
+    "url": "https://arxiv.org/pdf/physics/0511168",
+    "evidence": "Peer-reviewed clock-control study; project data remain simulated",
+    "verified": "2026-10-24",
+    "locator": "Accessible arXiv v1 Sec.6; journal DOI metadata checked",
+    "implementation": "references/clock_equation_map.md; diamondclock/clock_*.py; diamondclock/oscillator.py",
+    "note": "Servo principles only. Our NV positional PI, limits and gains are engineering assumptions; no ion-clock instability is transferred."
+  },
+  {
+    "id": "LER2017",
+    "title": "On-line estimation of local oscillator noise and optimisation of servo parameters in atomic clocks",
+    "authors": "I. D. Leroux et al.",
+    "year": 2017,
+    "journal": "Metrologia 54, 307-321",
+    "doi": "10.1088/1681-7575/aa66e9",
+    "url": "https://arxiv.org/pdf/1701.06697",
+    "evidence": "Peer-reviewed clock-control study; project data remain simulated",
+    "verified": "2026-10-24",
+    "locator": "Accessible arXiv v2 servo/noise analysis; journal DOI metadata checked",
+    "implementation": "references/clock_equation_map.md; diamondclock/clock_*.py; diamondclock/oscillator.py",
+    "note": "Motivates noise/gain/probe-time trade-offs. No optimal adaptive servo or apparatus-specific LO fit is claimed."
+  },
+  {
+    "id": "SCH2017",
+    "title": "Ultrastable optical clock with two cold-atom ensembles",
+    "authors": "M. Schioppo et al.",
+    "year": 2017,
+    "journal": "Nature Photonics 11, 48-52",
+    "doi": "10.1038/nphoton.2016.231",
+    "url": "https://www.nature.com/articles/nphoton.2016.231",
+    "evidence": "Peer-reviewed clock-control study; project data remain simulated",
+    "verified": "2026-10-24",
+    "locator": "Abstract; timing and sensitivity discussion; published online 28 Nov 2016, issue 2017",
+    "implementation": "references/clock_equation_map.md; diamondclock/clock_*.py; diamondclock/oscillator.py",
+    "note": "Primary experimental evidence of dead-time aliasing in that optical clock. Context only; neither NV validation nor an implemented general Dick-limit calculation."
   }
 ]

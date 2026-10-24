@@ -1,0 +1,55 @@
+{
+  "optical": {
+    "states": 7,
+    "Bz_G": 20.0,
+    "temperature_K": 297.0,
+    "pump_s": 2000000.0,
+    "rabi_Hz": 200000.0,
+    "pure_dephasing_s": 100000.0,
+    "ground_pair_s": 1000.0
+  },
+  "rates": {
+    "radiative_s": 63700000.0,
+    "isc_zero_s": 9300000.0,
+    "isc_pm_s": 53000000.0,
+    "singlet_zero_s": 900000.0,
+    "singlet_pm_s": 500000.0
+  },
+  "detector": {
+    "efficiency": 0.01,
+    "centers": 1,
+    "background_s": 1000.0,
+    "dark_s": 100.0
+  },
+  "oscillator": {
+    "offset_Hz": 150000.0,
+    "drift_Hz_s": 10000.0,
+    "white_fm_Hz_at_1s": 300.0,
+    "random_walk_Hz_sqrt_s": 100.0,
+    "phase_noise_rad": 0.02
+  },
+  "controller": {
+    "proportional": 0.0,
+    "integral_per_s": 3.0,
+    "latency_s": 0.01,
+    "correction_limit_Hz": 2000000.0,
+    "capture_Hz": 450000.0,
+    "lock_error_Hz": 100000.0,
+    "lock_sigma_Hz": 80000.0,
+    "consecutive_good": 8,
+    "consecutive_bad": 4,
+    "max_reacquisitions": 0
+  },
+  "native_dt_s": 0.002,
+  "gate_s": 0.01,
+  "settling_s": 2e-05,
+  "cycles": 128,
+  "acquisition_points": 81,
+  "acquisition_span_Hz": 4000000.0,
+  "dither_Hz": 250000.0,
+  "maximum_time_s": 120.0,
+  "fixed_analysis_start_s": 2.0,
+  "seed": 410024,
+  "reference_offset_Hz": -35000.0,
+  "plant_backend": "lindblad"
+}
