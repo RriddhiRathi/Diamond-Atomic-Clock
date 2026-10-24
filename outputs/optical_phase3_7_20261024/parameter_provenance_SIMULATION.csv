@@ -1,0 +1,22 @@
+parameter,value,unit,classification,source,locator,published_value,published_standard_deviation,uncertainty_propagated,experimental_validation
+radiative_s,63700000.0,s^-1,published_fitted_value,TET2012,"Table 1, printed p.9, NV E",63700000.0,4500000.0,False,Published defect only; not this simulator or sample
+isc_zero_s,9300000.0,s^-1,published_fitted_value,TET2012,"Table 1, printed p.9, NV E",9300000.0,3000000.0,False,Published defect only; not this simulator or sample
+isc_pm_s,53000000.0,s^-1,published_fitted_value,TET2012,"Table 1, printed p.9, NV E",53000000.0,5900000.0,False,Published defect only; not this simulator or sample
+singlet_zero_s,900000.0,s^-1,published_fitted_value,TET2012,"Table 1, printed p.9, NV E",900000.0,800000.0,False,Published defect only; not this simulator or sample
+singlet_pm_s,500000.0,s^-1,published_fitted_value,TET2012,"Table 1, printed p.9, NV E",500000.0,200000.0,False,Published defect only; not this simulator or sample
+optical.states,7,dimensionless,simulation_assumption,MODEL,docs/OPTICAL_METHODS.md,,,False,None
+optical.Bz_G,20.0,G,simulation_assumption,MODEL,docs/OPTICAL_METHODS.md,,,False,None
+optical.temperature_K,297.0,K,simulation_assumption,MODEL,docs/OPTICAL_METHODS.md,,,False,None
+optical.pump_s,2000000.0,s^-1,simulation_assumption,MODEL,docs/OPTICAL_METHODS.md,,,False,None
+optical.rabi_Hz,200000.0,Hz,simulation_assumption,MODEL,docs/OPTICAL_METHODS.md,,,False,None
+optical.pure_dephasing_s,100000.0,s^-1,simulation_assumption,MODEL,docs/OPTICAL_METHODS.md,,,False,None
+optical.ground_pair_s,1000.0,s^-1,simulation_assumption,MODEL,docs/OPTICAL_METHODS.md,,,False,None
+detector.efficiency,0.01,dimensionless,simulation_assumption,MODEL,docs/OPTICAL_METHODS.md,,,False,None
+detector.centers,100,dimensionless,simulation_assumption,MODEL,docs/OPTICAL_METHODS.md,,,False,None
+detector.background_s,1000.0,counts/s,simulation_assumption,MODEL,docs/OPTICAL_METHODS.md,,,False,None
+detector.dark_s,100.0,counts/s,simulation_assumption,MODEL,docs/OPTICAL_METHODS.md,,,False,None
+points,81,dimensionless,numerical_protocol,MODEL,OPM7,,,,None
+span_Hz,6000000.0,Hz,numerical_protocol,MODEL,OPM7,,,,None
+dwell_s,0.001,s,numerical_protocol,MODEL,OPM7,,,,None
+seed,310024,dimensionless,numerical_protocol,MODEL,OPM7,,,,None
+backend,lindblad,dimensionless,numerical_protocol,MODEL,OPM7,,,,None
