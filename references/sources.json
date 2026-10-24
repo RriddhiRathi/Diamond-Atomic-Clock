@@ -110,5 +110,63 @@
     "locator": "M1-M8, docs/METHODOLOGY.md; Config field metadata",
     "implementation": "diamondclock/simulation.py; diamondclock/reporting.py",
     "note": "Environmental spectra, readout levels, calibration errors, and residual oscillator noise are user-defined assumptions. They are not attributed to a research paper."
+  },
+  {
+    "id": "D2012",
+    "title": "Theory of the ground-state spin of the NV- center in diamond",
+    "authors": "M. W. Doherty et al.",
+    "year": 2012,
+    "journal": "Physical Review B 85, 205203",
+    "doi": "10.1103/PhysRevB.85.205203",
+    "url": "https://doi.org/10.1103/PhysRevB.85.205203",
+    "evidence": "Peer-reviewed spin Hamiltonian theory; literature-quoted Stark coefficients",
+    "verified": "2026-10-24",
+    "locator": "Sec. II B, p. 205203-6: text after Eq. (16), before Eq. (17); Eq. (24), p. 205203-7",
+    "implementation": "diamondclock/odmr.py:Stark,spectroscopy_hamiltonian",
+    "note": "Equation and quoted coefficients checked in author-repository full-text extracts. Original Stark experiment V1990 linked separately; its numerical text not independently rechecked. Coordinate convention and weak-field limits documented."
+  },
+  {
+    "id": "DRE2011",
+    "title": "Avoiding power broadening in optically detected magnetic resonance of single NV defects for enhanced dc magnetic field sensitivity",
+    "authors": "A. Dreau et al.",
+    "year": 2011,
+    "journal": "Physical Review B 84, 195204",
+    "doi": "10.1103/PhysRevB.84.195204",
+    "url": "https://doi.org/10.1103/PhysRevB.84.195204",
+    "evidence": "Peer-reviewed ODMR sensitivity analysis; no experimental dataset imported",
+    "verified": "2026-10-24",
+    "locator": "Eqs. (1)-(3), p. 195204-2; Sec. II B",
+    "implementation": "diamondclock/odmr.py:lorentzian; diamondclock/odmr_bridge.py:readout_eta",
+    "note": "Publisher DOI verified; author manuscript https://arxiv.org/html/1108.0178v2 inspected for equations, with published full-text search confirmation. Ideal low-contrast resolved-line formula only. Scenario noise is not the measured sensitivity of this paper."
+  },
+  {
+    "id": "V1990",
+    "title": "Electric-field-induced modulation of spin echoes of N-V centers in diamond",
+    "authors": "E. van Oort and M. Glasbeek",
+    "year": 1990,
+    "journal": "Chemical Physics Letters 168, 529-532",
+    "doi": "10.1016/0009-2614(90)85665-Y",
+    "url": "https://doi.org/10.1016/0009-2614(90)85665-Y",
+    "evidence": "Original experimental Stark source; bibliography verified, numerical text not independently checked",
+    "verified": null,
+    "verification_scope": "metadata_only",
+    "locator": "pp. 529-532; coefficient values used as quoted with locators in D2012",
+    "implementation": "diamondclock/odmr.py:Stark (via D2012 quotation)",
+    "note": "Do not claim independent full-text verification of the original coefficient measurement."
+  },
+  {
+    "id": "MATLAB_INTERN",
+    "title": "Original intern-developed four-orientation NV ODMR MATLAB implementation (user-supplied transcript)",
+    "authors": "Original intern; name not supplied",
+    "year": 2026,
+    "journal": "Unpublished implementation archive; not a research paper",
+    "doi": null,
+    "url": "legacy/matlab/intern_odmr_as_supplied.m.txt",
+    "evidence": "Original implementation attribution; supplied with syntax and formatting damage",
+    "verified": null,
+    "record_type": "implementation_archive",
+    "locator": "legacy/matlab/README.md; supplied transcript",
+    "implementation": "diamondclock/odmr.py; corrected Python adaptation",
+    "note": "Received 2026-10-24; original creation date unknown. Whitespace normalized; no executable original .m file or license supplied. Original authorship is not claimed by the Python integration."
   }
 ]

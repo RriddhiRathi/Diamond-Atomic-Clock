@@ -1,0 +1,11 @@
+tau_s,adev,overlapping_pairs,m,method,data_kind,scenario
+200.0,4.657079279047395e-07,3697,200,single_electron,SIMULATION,Original assumed readout
+200.0,4.972488199434262e-07,3697,200,electron_average,SIMULATION,Original assumed readout
+200.0,5.0730319246177855e-09,3697,200,external_thermometer,SIMULATION,Original assumed readout
+200.0,1.405749132838941e-07,3697,200,nuclear_average,SIMULATION,Original assumed readout
+200.0,1.896485492991617e-09,3697,200,composite,SIMULATION,Original assumed readout
+200.0,4.69517753304737e-07,3697,200,single_electron,SIMULATION,ODMR-informed ideal readout
+200.0,5.364050632674112e-07,3697,200,electron_average,SIMULATION,ODMR-informed ideal readout
+200.0,2.0730446906579106e-07,3697,200,external_thermometer,SIMULATION,ODMR-informed ideal readout
+200.0,1.405749132838941e-07,3697,200,nuclear_average,SIMULATION,ODMR-informed ideal readout
+200.0,8.280659330194628e-08,3697,200,composite,SIMULATION,ODMR-informed ideal readout

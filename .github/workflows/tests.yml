@@ -1,7 +1,7 @@
 name: Regression tests
 on:
   push:
-    branches: [main, 'fix/**']
+    branches: [main, 'fix/**', 'feature/**']
   pull_request:
 permissions:
   contents: read

@@ -1,0 +1,191 @@
+Clear all;close all;clc;
+
+%Define NV center parameters
+%NV center orientations wrt lab frame
+%Hamiltonian params, external B field and direction
+%uWave field mag and orientation in lab frame
+Dgs = 2.87e3; % Mhz, zero field frequency
+Sz = (1/sqrt(1))\*([1 0 0 ;...
+&#x9;      0 0 0;...
+           0 0 -1]);
+Sx = (1/sqrt(2))\*([0 1 0 ;...
+&#x9;      1 0 1;...
+           0 1 0]);
+Sy = (1/sqrt(2))\*([0 -1i 0 ;...
+&#x9;      1i 0 -1i;...
+           0 1i 0]);
+muB = 9.274e-24;
+gNV = 2.0028;
+muN = 5.051e-27;
+gN = 0.404;
+h = 6.626e-34;
+gammaNV = muB \* gNV / h / 1e10 ; % NV gyromagnetic ratio (in MHz/G)
+gammaN = muN \* gN / h / 1e10 ; % N gyromagnetic ratio (in MHz/G)
+dpar = 3.5e-9;
+derp = 0.17e-6;
+Apar = -2.14 ; %MHz
+Aperp = -2.7 ; %MHz
+Iz = Sz;
+Ix = Sx;
+Iy = Sy;
+P = -4.95; %MHz
+% uwave frequency range
+fi = 2800;
+ff = 3000;
+npts = 5000;
+fstep = (ff-fi)/npts;
+uw_freq = [fi:fstep:ff];
+linewidth = 0.3; %MHz
+Hel_param = struct(‘Dgs’,Dgs , ‘dpar’, dpar, ‘Sz’ , Sz, ‘Sx’ , Sx , ‘Sy’ , Sy , ‘dperp’ , dperp , ‘gammaNV’ , gammaNV);
+Hnuc_param = struct (‘ apar’, Apar , ‘aperp’ , Aperp, ‘Sz’ , Sz, ‘Sx’ , Sx , ‘Sy’ , Sy, ‘Iz’ , Iz, ‘Ix’ , Ix , ‘Iy’ , Iy , ‘P’ , P, ‘gammaN’ , gammaN);
+Hint_param = struct(‘gammaNV’ , gammaNV, ‘Sz’ , Sz, ‘Sx’ , Sx , ‘Sy’ , Sy, ‘gammaN’ , gammaN, ‘Iz’ , Iz, ‘Ix’ , Ix , ‘Iy’ , Iy );
+%Transformation matrices from lab frame to NV frame
+Transform *Lab\_*&#x74;o_NV=struct(...
+ ‘Tnv1’,[-1/sqrt(6) 1/sqrt(6) -2/sqrt(6);...
+            -1/sqrt(2) -1/sqrt(2) 0;..
+            -1/sqrt(3) 1/sqrt(3) 1/sqrt(3)] …
+‘Tnv2’,[1/sqrt(6) 1/sqrt(6) 2/sqrt(6);...
+            1/sqrt(2) -1/sqrt(2) 0;..
+            1/sqrt(3) 1/sqrt(3) -1/sqrt(3)] ...
+‘Tnv3’,[-1/sqrt(6) -1/sqrt(6) 2/sqrt(6);...
+            -1/sqrt(2) 1/sqrt(2) 0;..
+            -1/sqrt(3) -1/sqrt(3) -1/sqrt(3)] ...
+‘Tnv4’,[1/sqrt(6) -1/sqrt(6) -2/sqrt(6);...
+            1/sqrt(2) 1/sqrt(2) 0;..
+            1/sqrt(3) -1/sqrt(3) 1/sqrt(3)] …
+%------B and E field—-
+disable_field=0;
+ref_nv_index=4;
+B=18;
+thetaB_nv=3\*pi/8;
+phiB_nv=3\*pi/7;
+%Magnitude and direction of E field in spherical coordinate in nv4 frame
+E=0;
+thetaE_nv=pi/2;
+phiE_nv=pi/4;
+%-----Transform B and E from reference NV frame to lab frame spherical
+B_refNV_cartesian =spherical_to_cartesian([B,thetaB_nv,phiB_nv]’);
+B_lab=nv_to_lab(Transform_Lab_to_NV.Tnv1,transform_Lab_to_NV.Tnv2,...
+&#x9; Transform_lab_to_NV.Tnv3,Transform_Lab_to_NV.Tnv4,...
+ref_nv_index,B_refNV_cartesian);
+B_lab_spherial=cartesian_to_spherical(B_lab);
+E_refNV_cartesian=spherical_to_cartesian([E,thetaE_nv,phiE_nv]’);
+R_lab=nv_to_lab(Transform_Lab_to_NV.Tnv1,Transform_Lab_to_NV.Tnv2,...
+&#x9; Transform_lab_to_NV.Tnv3,Transform_Lab_to_NV.Tnv4,...
+ref_nv_index,E_refNV_cartesian);
+E_lab_spherical=cartesian_to_spherical(E_lab);
+%--------
+% Direction of uWave field in spherical coordinate in Lab Frame
+uwAmp=1;
+theta_uw_lab=pi/2;
+phi_uw_lab=0;
+%uw_refNV_cartesian=spherical_to_cartesian([uwAmp,theta_uw_lab,phi_uw_lab]’);
+%uw_lab=nv_to_lab(Transform_Lab_to_NV.Tnv1,Transform_Lab_to_NV.Tnv2,...
+% Transform_lab_to_NV.Tnv3,Transform_Lab_to_NV.Tnv4,...
+% ref_nv_index,uw_refNV_cartesian);
+%uw_vec_lab_spherical=cartesian_to_spherical(uw_lab);
+uw_vec_lab_spherical=cartesian_to_spherical(uwAmp,theta_uw_lab,phi_uw_lab);
+odmr=zeros(1,length(uw_freq));
+odmr_nv=zeros(4,length(uw_freq));
+%for each NV axis
+For nv_index=1:4
+%sum over ODMr for all NV
+odmr_nv(nv_index,:)=ODMR_single_Nv(Transform_Lab_to_NV,Hel_param,Hnuc_param,
+Hint_param,nv_index,B_lab_spherical,E_lab_spherical,uw_vec_lab_spherical,uw_freq,linewidth,disable_field);
+odmr=odmr+odmr_nv(nv_index,:);
+End
+odmr=odmr/4;
+plot(uw_freq,(odmr)/1);grid;
+Figure;
+subplot(2,2,1);
+plot(uw_freq,odmr_nv(1,:));grid;legend(‘NV1’);
+subplot(2,2,2);
+plot(uw_freq,odmr_nv(2,:));grid;legend(‘NV2’);
+subplot(2,2,3);
+plot(uw_freq,odmr_nv(3,:));grid;legend(‘NV3’);
+subplot(2,2,4);
+plot(uw_freq,odmr_nv(4,:));grid;legend(‘NV4’);
+
+function Ts = ODMR_single_NV(Transform_Lab_to_NV,Hel_param, Hnuc_param, Hint_param, nv_index, B_lab_spherical, E_lab_spherical, uw_vec_lab_spherical, uw_freq, linewidth, disable_field)
+% convert B and E from lab frame to that particular NV Frame
+B_lab_cartesian = spherical_to_cartesian(B_lab_spherical);
+if(disable_field ==1)
+&#x9; B_NV = [0 0 0]’;
+else
+&#x9; nv_index
+&#x9; B_NV= lab_to_nv(Transform_Lab_to_NV.Tnv1, Transform_Lab_to_NV.Tnv2,...
+&#x9; Transform_Lab_to_NV.Tnv3, Transform_Lab_to_NV.Tnv4,...
+&#x9; Nv_index, B_lab_cartesian)
+end
+E_lab_cartesian = spherical_to_cartesian(E_lab_spherical);
+if(disable_field == 1)
+&#x9; E_NV= [0 0 0 ]’;
+else
+&#x9; E_NV = lab+to_nv(Transform_Lab_to_NV.Tnv1,Transform_Lab_to_NV.Tnv2,...
+&#x9; Transform_Lab_to_NV.Tnv3,Transform_Lab_to_NV.Tnv4,...
+&#x9; Nv_index, E_lab_cartesian);
+end
+% get ground state as eigen vectors and frequency as eigen values of total hamiltonian
+[states, statefreq] = eigen_vec_values_Bonly(Hel_param, Hnuc_param, B_NV, E_NV);
+& get transition amplitude with Lorentzian shape under microwave excitation
+uw_vc_lab_cartesian = spherical_to_cartesian(uw_vec_lab_spherical);
+uw_NV = lab_to_nv(Transform_lab_to_NV.Tnv1,Transform_lab_to_NV.Tnv2,...
+&#x9; Transform_lab_to_NV.Tnv3,Transform_lab_to_NV.Tnv4,...
+&#x9; nv_index, uw_vec_lab_cartesian);
+Strength= transition(states, statefreq, Hint_Param, uw_NV, uw_freq, linewidth);
+Ts = Tstrength;
+end
+
+Function[eigvec, eigval] = eigen_vec_values_Bolny(hel_param, Hnuc_param, B_NV, E_NV)
+I = [ 1 0 0 ; …
+       0 1 0; …
+       0 0 1;];
+tmp1 = (Hel_param.Sz \* hel_param.Sz) - (2/3)\*I;
+tmp2 = B_NV(1)\*Hel_param.Sx +B_NV(2)\*Hel_param,Sy + B_NV(3)\*Hel_param.Sz ;
+Hel = (Hel_param.Dgs \* kron(tmp1,I) +...
+&#x9; hel_pam.gammaNV \* kron(tmp2, I) ) ;
+tmp6 = Hnuc_param.Sz \* Hnuc_param.Iz ;
+% tmp7 = (Hnuc_param.Sx \* Hnuc_param.Ix) + (Hnuc_param.Sy \* Hnuc_param.Iy);
+tmp8 = ((Hnuc_param.Iz \* Hnuc_param.Iz) - (2/3)\*I);
+tmp9 = B_NV(1)\*Hnuc_param.Ix + B_NV(2)\*Hnuc_param.Iy + B_NV(3)\*Hnuc_param.Iz ;
+Hnuc = Hnuc_param.apar \* kron(Hnuc_param.sz, Hnuc_param.Iz) +...
+&#x9; Hnuc_param[.aperp.Ix](http://.aperp.ix) + B_NV(2)\*Hnuc_param.Iz)+...
+kron(Hnuc_param.Sy,Hnuc_param.Iy))+...
+&#x9; Hnuc_param.P \* kron(I, tmp8)+...
+&#x9; Hnuc_param.gammaN \* kron(I,tmp9);
+Htot = Hel ; %+ Hnuc;
+[V, D] = eig(Htot);
+[sorted_eigval, idx] = sort((diag(d)), ‘ascend’);
+Sorted_eigvec = V(:idx);
+eigvec = sorted_eigvec;
+eigval = sorted_eigval;
+end
+
+function Tstrength = transition(states, statefreq, Hint_param, uw_NV, uw_freq, linewidth)
+I = [1 0 0;...
+     0 1 0;...
+     0 0 1;];
+tmp10 = uw_NV(1)\*Hint_param.Sx + uw_NV(2)\*Hint_param.Sy + uw_NV(3)\*Hint_param.Sz;
+tmp11 = uw_NV(1)\*Hint_param.Ix + uw_NV(2)\*Hint_param.Iy + uw_NV(3)\*Hint_param.Iz;
+Hint = Hint_param.gammaNV \* kron(tmp10, I) + …
+&#x9; Hint_param.gammaN \* kron(I, tmp11);
+N = length(statefreq);
+T = zeros(1, length(uw_freq));
+for ii = 1:N
+&#x9; initstate = states(:,ii);
+&#x9; initfreq = statefreq(ii);
+for jj = ii:N
+finalstate = states(:,jj);
+finalfreq = statefreq(jj);
+transition_vec = (conj(finalstate’) \* Hint) \* initstate;
+transition_amp = (abs(transition_vec’ \* transition_vec))^2;
+transition_shape = Lorentzian(uw_freq, initfreq, finalfreq, linewidth);
+T = T + transition_amp\*transition_shape;
+end
+end
+Tstrength = T;
+end
+
+function y = Lorentzian(uwfreq, init_freq, final_freq, linewidth)
+y = 1./(1 + ((uwfreq - abs(final_freq - init_freq)).^2)/((linewidth/2)^2));
+end &#x9;

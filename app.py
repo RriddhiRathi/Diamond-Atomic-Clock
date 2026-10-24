@@ -97,7 +97,7 @@ cols[2].metric('Electronic / composite ADEV',f'{base/target.adev:.2f}×' if targ
 cols[3].metric('Composite nuclear weight',f'{diag["wQ"]:.4f}')
 st.caption('Smaller Allan deviation means less change in the average ticking rate between neighboring averaging windows. A ratio below 1 means the composite is worse at the displayed averaging time.')
 
-tabs=st.tabs(['Stability lab','Environment & transitions','Compensation study','NV center explained','Research Paper Bucket','Export & methodology'])
+tabs=st.tabs(['Stability lab','Environment & transitions','Compensation study','NV center explained','Research Paper Bucket','Export & methodology','ODMR spectroscopy'])
 
 with tabs[0]:
     st.subheader('Frequency stability across averaging time')
@@ -208,7 +208,7 @@ with tabs[4]:
                 st.success(f'Added "{title.strip()}". Saved as unverified.')
             except (ValueError,OSError,sqlite3.Error) as exc:
                 st.error(str(exc))
-    paper_count=sum(source['id']!='MODEL' for source in paper_bucket)
+    paper_count=sum(source['id']!='MODEL' and source.get('record_type')!='implementation_archive' for source in paper_bucket)
     st.info(f'{paper_count} papers/research references and {len(paper_bucket)} total references are currently in the bucket.')
     catalog_data=catalog_bytes(paper_bucket)
     catalog_digest=hashlib.sha256(catalog_data).hexdigest()
@@ -264,3 +264,8 @@ with tabs[5]:
         right.download_button('Download vector PDF',files['stability_SIMULATION.pdf'],'stability_SIMULATION.pdf','application/pdf')
     st.download_button('Download active configuration',json.dumps(asdict(c),indent=2),'config.json','application/json')
     st.markdown((ROOT/'docs/METHODOLOGY.md').read_text(encoding='utf-8'))
+
+
+with tabs[6]:
+    from diamondclock.odmr_dashboard import render_odmr
+    render_odmr(c,fingerprint,paper_bucket,reference_error)

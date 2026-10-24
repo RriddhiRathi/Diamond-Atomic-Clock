@@ -14,6 +14,7 @@ def source_files(root=ROOT):
     for folder, pattern in (("diamondclock", "*.py"), ("references", "*"),
                             ("docs", "*.md"), ("scripts", "*.py"), ("tests", "*.py")):
         paths.extend(p for p in (root / folder).glob(pattern) if p.is_file())
+    paths.extend(p for p in (root / "legacy").rglob("*") if p.is_file())
     paths.extend(root / name for name in
                  ("app.py", "README.md", "pyproject.toml", "requirements.txt",
                   "requirements-dev.txt") if (root / name).is_file())

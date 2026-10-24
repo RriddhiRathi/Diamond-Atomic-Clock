@@ -1,0 +1,6 @@
+{
+  "linewidth_Hz": 300000.0,
+  "line_contrast": 0.03,
+  "photon_rate_per_s": 1000000.0,
+  "duty_fraction": 1.0
+}
