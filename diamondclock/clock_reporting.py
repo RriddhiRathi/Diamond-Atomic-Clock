@@ -120,9 +120,15 @@ def clock_figures(result,c):
         fb=tables['feedback']
         if 'detuning_Hz' in fb:
             good=fb[fb.valid & np.isfinite(fb.sigma_Hz)]
-            x=good.measurement_midpoint_local_s
-            bx.plot(x,good.detuning_Hz/1e3,color='#2470dd',lw=.8,label='Accepted photon estimates')
-            bx.fill_between(x,(good.detuning_Hz-good.sigma_Hz)/1e3,(good.detuning_Hz+good.sigma_Hz)/1e3,alpha=.15,color='#2470dd',label='Reported 1 sigma')
+            x=fb.measurement_midpoint_local_s
+            accepted=fb.valid & np.isfinite(fb.sigma_Hz)
+            value=fb.detuning_Hz.where(accepted);sigma=fb.sigma_Hz.where(accepted)
+            # NaN gaps preserve rejected cycles; never interpolate across a failed lock.
+            bx.plot(x,value/1e3,color='#2470dd',lw=.8,marker='.',markersize=2,label='Accepted photon estimates')
+            bx.fill_between(x,(value-sigma)/1e3,(value+sigma)/1e3,alpha=.15,color='#2470dd',label='Reported 1 sigma')
+            if len(good)<20:
+                bx.errorbar(good.measurement_midpoint_local_s,good.detuning_Hz/1e3,yerr=good.sigma_Hz/1e3,
+                    fmt='none',elinewidth=.8,color='#2470dd')
             bx.legend(fontsize=8)
             bx.text(.02,.95,f'{len(fb)-len(good)} rejected cycles retained in CSV',transform=bx.transAxes,fontsize=7,va='top')
         else:bx.text(.5,.5,'No acquired resonance / no tracking estimates',transform=bx.transAxes,ha='center')
