@@ -14,21 +14,28 @@ def test_declared_dependencies_match_requirements_and_package_scope():
 
 def test_editable_and_wheel_assets_in_clean_environment(tmp_path):
     root=Path(__file__).resolve().parents[1];env=tmp_path/'venv'
-    venv.EnvBuilder(with_pip=True,system_site_packages=True).create(env)
+    # Do not inherit site packages: nested venvs need their own build/runtime deps.
+    venv.EnvBuilder(with_pip=True).create(env)
     executable=env/('Scripts/python.exe' if os.name=='nt' else 'bin/python')
     environment=dict(os.environ);environment.pop('PYTHONPATH',None)
     environment['DIAMONDCLOCK_REFERENCE_DB']=str(tmp_path/'refs.sqlite3')
     def run(*arguments):
-        p=subprocess.run([str(executable),*arguments],cwd=tmp_path,env=environment,capture_output=True,text=True,timeout=180)
+        p=subprocess.run([str(executable),*arguments],cwd=tmp_path,env=environment,capture_output=True,text=True,timeout=600)
         assert p.returncode==0,p.stdout+'\n'+p.stderr
         return p
-    run('-m','pip','install','--no-deps','--no-build-isolation','-e',str(root))
+    run('-m','pip','install','-e',str(root))
+    run('-m','pip','check')
     run('-I','-c','import diamondclock; from diamondclock.resources import project_root; assert (project_root()/"references/sources.json").is_file()')
     wheels=tmp_path/'wheels'
     # Build into a temporary target, avoiding dependence on current working directory.
-    run('-m','pip','wheel','--no-deps','--no-build-isolation','--wheel-dir',str(wheels),str(root))
+    run('-m','pip','wheel','--no-deps','--wheel-dir',str(wheels),str(root))
     wheel=next(wheels.glob('*.whl'))
-    run('-m','pip','install','--no-deps','--force-reinstall',str(wheel))
+    # A separate environment prevents the editable install masking wheel defects.
+    env=tmp_path/'wheel_venv'
+    venv.EnvBuilder(with_pip=True).create(env)
+    executable=env/('Scripts/python.exe' if os.name=='nt' else 'bin/python')
+    run('-m','pip','install',str(wheel))
+    run('-m','pip','check')
     code='''import diamondclock
 from pathlib import Path
 from diamondclock.resources import project_root
