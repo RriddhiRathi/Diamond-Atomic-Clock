@@ -18,7 +18,8 @@ from .simulation import Config, METHODS
 from .reference_store import curated_sources, catalog_bytes, bibtex_bytes
 from .run_provenance import capture, validate
 
-ROOT=Path(__file__).resolve().parent.parent
+from .resources import project_root
+ROOT=project_root()
 COLORS=['#7c8598','#149ca8','#ed9d38','#aa6bd3','#2470dd']
 
 

@@ -29,3 +29,6 @@ user_data/
 
 
 *.egg-info/
+# Python build outputs
+build/
+dist/

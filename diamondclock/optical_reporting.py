@@ -17,7 +17,8 @@ from .reporting import environment, figure_bytes, sources
 from .reference_store import catalog_bytes, bibtex_bytes
 from .run_provenance import capture, validate
 
-ROOT=Path(__file__).resolve().parents[1]
+from .resources import project_root
+ROOT=project_root()
 
 
 def _table_hashes(tables):

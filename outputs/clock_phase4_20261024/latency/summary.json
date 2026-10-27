@@ -1,0 +1,43 @@
+{
+  "data_kind": "SIMULATION",
+  "experimental_validation": false,
+  "nominal_Hz": 2926346000.0,
+  "evaluation_hamiltonian_reference_Hz": 2926311000.0,
+  "lo_seed": 2519528759,
+  "photon_seed": 1342168587,
+  "timed_out": false,
+  "acquisitions": 1,
+  "completed_cycles": 256,
+  "record_s": 16.226,
+  "observed_lock_fraction": 0.0,
+  "final_time_errors_s": {
+    "locked": -0.0026560760677108277,
+    "unlocked": 0.0012813837937749903
+  },
+  "optical_trace_roundoff_max": 9.540634949079217e-11,
+  "uncertainty": "Count-only profile intervals plus first-order independent calibration-shape covariance; coverage tested, not guaranteed.",
+  "scope": "Low-field single-transition NV-referenced LO. No SI accuracy claim or 475 G optical validation.",
+  "fixed_window_tracking_evaluation": {
+    "start_s": 2.0,
+    "accepted": 9,
+    "bias_Hz": 26011.090619696715,
+    "rmse_Hz": 42955.18184914887,
+    "empirical_interval_coverage": 1.0,
+    "interpretation": "Offline check against gate-averaged Hamiltonian detuning; not fed back or bias-corrected"
+  },
+  "estimator_validation": [],
+  "validation_protocol": {
+    "matched_trials": 0,
+    "physical_trials": 0,
+    "matched_seed": 411,
+    "physical_seed": 412,
+    "gate_s": 0.01,
+    "centers": 100,
+    "efficiency": 0.01,
+    "reference": "Sequential driven gates and joint counting moments"
+  },
+  "count_model": "Poisson gate approximation; driven Lindblad variance/covariance reference exported",
+  "optical_backend": "lindblad",
+  "absolute_frequency": "Acquisition is in commanded-frequency coordinates; photons constrain oscillator-reference detuning, not an SI calibration",
+  "timing": "Gate and actuator deadlines use the local oscillator timebase; true simulation timestamps are evaluator-only"
+}

@@ -6,7 +6,8 @@ from dataclasses import asdict
 from datetime import datetime, timezone
 from pathlib import Path, PurePosixPath
 
-ROOT = Path(__file__).resolve().parents[1]
+from .resources import project_root
+ROOT = project_root()
 
 
 def source_files(root=ROOT):
@@ -17,7 +18,7 @@ def source_files(root=ROOT):
     paths.extend(p for p in (root / "legacy").rglob("*") if p.is_file())
     paths.extend(root / name for name in
                  ("app.py", "README.md", "pyproject.toml", "requirements.txt",
-                  "requirements-dev.txt") if (root / name).is_file())
+                  "requirements-dev.txt", "setup.py", "MANIFEST.in") if (root / name).is_file())
     return {p.relative_to(root).as_posix(): p.read_bytes() for p in sorted(paths)}
 
 
