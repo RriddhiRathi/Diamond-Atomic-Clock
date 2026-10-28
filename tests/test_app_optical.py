@@ -1,11 +1,7 @@
-from streamlit.testing.v1 import AppTest
-from pathlib import Path
-
-
-def test_existing_dashboard_optical_measurement_and_resubmission():
-    app=AppTest.from_file(str(Path(__file__).resolve().parents[1]/'app.py'),default_timeout=90).run()
+def test_existing_dashboard_optical_measurement_and_resubmission(research_app):
+    app=research_app('Optical measurement')
     assert not app.exception
-    assert any(t.label=='Optical measurement' for t in app.tabs)
+    assert any(t.value=='Optical excitation and photon measurements' for t in app.subheader)
     app.selectbox(key='optical_points').set_value(41)
     app.button(key='run_optical').click().run()
     assert not app.exception

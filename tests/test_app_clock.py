@@ -1,11 +1,7 @@
-from pathlib import Path
-from streamlit.testing.v1 import AppTest
-
-
-def test_existing_app_clock_controls_feedback_and_recalculation():
-    app=AppTest.from_file(str(Path(__file__).resolve().parents[1]/'app.py'),default_timeout=120).run()
+def test_existing_app_clock_controls_feedback_and_recalculation(research_app):
+    app=research_app('Frequency lock')
     assert not app.exception
-    assert any(t.label=='Frequency lock' for t in app.tabs)
+    assert any(t.value=='Photon-based frequency lock' for t in app.subheader)
     app.selectbox(key='clock_cycles').set_value(32)
     app.button(key='run_clock').click().run()
     assert not app.exception

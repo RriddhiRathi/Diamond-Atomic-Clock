@@ -53,12 +53,8 @@ def render_clock(fingerprint,paper_bucket,reference_error=None):
     except ValueError as exc:st.error(str(exc));return
     st.metric('Observed lock fraction',f"{100*result['summary']['observed_lock_fraction']:.1f}%")
     st.caption('Lock detection uses counts and reported uncertainty. Hidden truth is reserved for offline error evaluation.')
-    fig=go.Figure();data=result['tables']['allan']
-    for method in ('unlocked','locked'):
-        a=data[(data.method==method)&(data.adev>0)]
-        fig.add_scatter(x=a.tau_s,y=a.adev,name=('feedback enabled' if method=='locked' else 'free running')+', full record')
-    fig.update_layout(xaxis_type='log',yaxis_type='log',xaxis_title='Averaging time (s)',yaxis_title='Allan deviation')
-    st.plotly_chart(fig,width='stretch');st.dataframe(result['tables']['feedback'],hide_index=True)
+    render_clock_stability(result)
+    st.dataframe(result['tables']['feedback'],hide_index=True)
     digest=hashlib.sha256(json.dumps(paper_bucket,sort_keys=True).encode()).hexdigest()
     if st.button('Prepare clock research bundle',key='prepare_clock_export',disabled=reference_error is not None):
         try:st.session_state['clock_export']=(key,digest,zip_files(export_clock(result,cfg,references=paper_bucket)))
@@ -66,3 +62,13 @@ def render_clock(fingerprint,paper_bucket,reference_error=None):
     value=st.session_state.get('clock_export')
     if value and value[:2]==(key,digest):
         st.download_button('Download complete clock run',value[2],'DiamondClock_phase4_SIMULATION.zip','application/zip')
+
+
+def render_clock_stability(result):
+    """The existing full-record Allan plot, shared with the read-only demo view."""
+    fig=go.Figure();data=result['tables']['allan']
+    for method in ('unlocked','locked'):
+        a=data[(data.method==method)&(data.adev>0)]
+        fig.add_scatter(x=a.tau_s,y=a.adev,name=('feedback enabled' if method=='locked' else 'free running')+', full record')
+    fig.update_layout(xaxis_type='log',yaxis_type='log',xaxis_title='Averaging time (s)',yaxis_title='Allan deviation')
+    st.plotly_chart(fig,width='stretch')

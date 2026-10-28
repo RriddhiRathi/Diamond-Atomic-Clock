@@ -1,16 +1,12 @@
-from pathlib import Path
-from streamlit.testing.v1 import AppTest
-
-
-def test_integrated_odmr_interaction_clock_comparison_and_export():
-    app=str(Path(__file__).resolve().parents[1]/'app.py')
-    at=AppTest.from_file(app,default_timeout=90).run()
+def test_integrated_odmr_interaction_clock_comparison_and_export(research_app):
+    at=research_app('ODMR spectroscopy')
     assert not at.exception
-    assert any(tab.label=='ODMR spectroscopy' for tab in at.tabs)
-    # Existing clock controls and metrics are present; new functionality is in the same app.
-    assert len(at.metric)==4
+    assert any(t.value=='ODMR spectroscopy' for t in at.subheader)
+    # Configure the preserved baseline before the optional paired ODMR comparison.
+    at.selectbox(key='research_workspace').set_value('Stability & compensation').run()
     at.sidebar.selectbox[0].set_value(4096)
     at.sidebar.button[0].click().run()
+    at.selectbox(key='research_workspace').set_value('ODMR spectroscopy').run()
     at.checkbox(key='odmr_compare').set_value(True)
     at.button(key='run_odmr').click().run()
     assert not at.exception
@@ -22,6 +18,11 @@ def test_integrated_odmr_interaction_clock_comparison_and_export():
     assert not at.exception
     files=at.session_state['odmr_export'][2]
     assert 'odmr_stability_comparison_SIMULATION.pdf' in files
+    at.selectbox(key='research_workspace').set_value('Optical measurement').run()
+    at.selectbox(key='research_workspace').set_value('ODMR spectroscopy').run()
+    assert not at.exception
+    assert at.checkbox(key='odmr_compare').value is True
+    assert at.session_state['odmr_export'][2] == files
     at.number_input(key='odmr_B').set_value(30.)
     at.button(key='run_odmr').click().run()
     assert not at.exception
@@ -29,8 +30,8 @@ def test_integrated_odmr_interaction_clock_comparison_and_export():
     assert at.session_state['odmr_result'][0][0]['B_lab_G']!=result['context']['config']['B_lab_G']
 
 
-def test_odmr_invalid_overlapping_clock_lines_shows_error():
-    at=AppTest.from_file(str(Path(__file__).resolve().parents[1]/'app.py'),default_timeout=90).run()
+def test_odmr_invalid_overlapping_clock_lines_shows_error(research_app):
+    at=research_app('ODMR spectroscopy')
     at.checkbox(key='odmr_compare').set_value(True)
     at.number_input(key='odmr_width').set_value(2.)
     at.button(key='run_odmr').click().run()

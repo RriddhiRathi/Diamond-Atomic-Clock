@@ -1,5 +1,14 @@
 # Diamond Atomic Clock
 
+**Dashboard redesign, Part 1:** the sidebar now provides Clock Overview,
+NV-Center Demonstration, Clock Performance and Advanced Research. Start in
+Demonstration Mode for the guided view; select Research Mode for scientific
+controls. All original tools remain under Advanced Research, and the photon-clock
+experiment also opens directly from Clock Performance. Overview does not run a
+simulation. See the [feature inventory and navigation guide](docs/DASHBOARD_REDESIGN.md).
+The scientific scope paragraphs below describe their respective original phases;
+the Phase 4 section describes the implemented closed-loop photon-clock simulation.
+
 Advanced nitrogen-14 NV-center **conditional frequency-stability simulator** with a Streamlit dashboard, Plotly exploration, traceable equations, and reproducible CSV/SVG/PDF exports. Version 0.1, prepared October 19, 2026.
 
 **Start here:** open this entire folder in VS Code. Run everything in the VS Code terminal on your Windows computer. ChatGPT helps review physics and results; Copilot can assist with local edits. Neither is required at runtime. No API key, paid API service, external dataset, or hardware is needed.
