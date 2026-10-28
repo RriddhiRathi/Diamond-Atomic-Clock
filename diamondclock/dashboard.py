@@ -19,7 +19,7 @@ h1 {letter-spacing:-.045em} h2,h3 {letter-spacing:-.025em}
 def preserve_workspace_state():
     """Keep inputs when routes hide widgets; never retain button/submit events."""
     for key in list(st.session_state):
-        if key.startswith(('legacy_', 'clock_', 'odmr_', 'optical_', 'research_')):
+        if key.startswith(('legacy_', 'clock_', 'odmr_', 'optical_', 'research_', 'nv_')):
             st.session_state[key] = st.session_state[key]
 
 
@@ -96,21 +96,9 @@ def render_overview():
 
 
 def render_demonstration():
-    st.title('From an NV center to a clock signal')
-    st.write('A nitrogen atom beside a vacant carbon site creates the NV defect in diamond. '
-             'Its spin transitions respond to the magnetic field and temperature.')
-    for column, title, text in zip(st.columns(3),
-            ('01 · Prepare & probe', '02 · Detect photons', '03 · Correct & compare'),
-            ('Optical excitation prepares and reads the spin. Scanning the microwave frequency reveals the ODMR response.',
-             'Spin-dependent fluorescence changes the detected counts. Photon statistics limit frequency estimation.',
-             'The count-based estimate drives oscillator feedback. Phase, time error and Allan deviation describe the output.')):
-        with column, st.container(border=True):
-            st.subheader(title)
-            st.write(text)
-    st.info('Part 1 establishes the guided workspace. The rotatable lattice, field geometry and '
-            'schematic optical animation are reserved for later parts of the redesign.')
-    st.caption('For the implemented quantitative models, open Advanced Research in Research Mode: '
-               'ODMR spectroscopy or Optical measurement. Clock Performance provides the existing feedback experiment.')
+    from .nv_dashboard import render_nv_demonstration
+
+    render_nv_demonstration()
 
 
 def render_performance(mode):

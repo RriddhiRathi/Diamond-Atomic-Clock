@@ -13,7 +13,7 @@ exposes the existing scientific forms. Switching modes never submits a form.
 | Section | Part 1 contents | Later redesign work |
 |---|---|---|
 | Clock Overview | Research objective, scientific sequence, starting configuration, validated last-run clock metrics and conditional interpretation | Consolidated configuration and deeper interpretation |
-| NV-Center Demonstration | Guided physics → resonance → photons → feedback narrative, links by navigation to existing quantitative workspaces | Physically grounded rotatable lattice, NV/field geometry, labeled optical animation |
+| NV-Center Demonstration | Part 2 now adds a rotatable diamond lattice, one N/vacancy pair, four NV-axis overlays and geometric field controls; see [NV_VISUALIZATION.md](NV_VISUALIZATION.md) | Live ODMR/fluorescence integration in Part 3; any optical animation must be labeled schematic |
 | Clock Performance | Existing photon-clock controls/results/exports in Research Mode; read-only completed-run metrics and shared full-record Allan plot in Demonstration Mode | Focused acquisition, correction, lock, phase/time and stability layout |
 | Advanced Research | All existing tools, grouped into four workspaces, available in Research Mode | Progressive disclosure of detailed controls |
 
@@ -76,5 +76,6 @@ check all routes without calculation, one actual clock run across modes/routes,
 input/export retention and rejection of a stale source result. The full suite also
 checks unchanged physics, historical output blobs, provenance and clean packaging.
 
-Part 1 intentionally does not implement the 3D lattice, new optical animations,
-new scientific models, regenerated research outputs, or the full performance redesign.
+Part 1 originally established the shell. Part 2 supplies the educational 3D lattice;
+no live spectrum integration, optical animation, new scientific model, regenerated
+research output or full performance redesign is included yet.

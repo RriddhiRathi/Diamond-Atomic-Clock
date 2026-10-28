@@ -266,5 +266,19 @@
     "locator": "Abstract; timing and sensitivity discussion; published online 28 Nov 2016, issue 2017",
     "implementation": "references/clock_equation_map.md; diamondclock/clock_*.py; diamondclock/oscillator.py",
     "note": "Primary experimental evidence of dead-time aliasing in that optical clock. Context only; neither NV validation nor an implemented general Dick-limit calculation."
+  },
+  {
+    "id": "AFLOW2017",
+    "title": "The AFLOW Library of Crystallographic Prototypes: Part 1",
+    "authors": "M. J. Mehl, D. Hicks, C. Toher, O. Levy, R. M. Hanson, G. L. W. Hart, S. Curtarolo",
+    "year": 2017,
+    "journal": "Computational Materials Science 136, S1–S828",
+    "doi": "10.1016/j.commatsci.2017.01.017",
+    "url": "https://aflow.org/p/A_cF8_227_a-001/",
+    "evidence": "Crystallographic prototype library; online diamond entry checked, not experimental NV imaging",
+    "verified": "2026-10-28",
+    "locator": "Online Diamond A4 entry: cF8, space group 227; primitive and basis vectors",
+    "implementation": "diamondclock/nv_visualization.py; references/nv_visualization_map.md",
+    "note": "Online structure entry and its cited bibliography checked. The project uses a translated-origin equivalent FCC + (1/4,1/4,1/4) construction, also explicitly documented by TU Wien node27.html. No numerical lattice constant, relaxed NV geometry or experimental imaging data is imported. Full journal text not independently reviewed in this step."
   }
 ]

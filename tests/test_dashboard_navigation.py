@@ -31,7 +31,11 @@ def test_landing_and_routes_do_not_calculate(monkeypatch):
     for section in SECTIONS:
         app.sidebar.radio(key='dashboard_section').set_value(section).run()
         assert not app.exception
-        assert not app.button
+        if section == 'NV-Center Demonstration':
+            # A camera reset is now intentional; no experiment submit is exposed.
+            assert [button.key for button in app.button] == ['reset_nv_camera']
+        else:
+            assert not app.button
     app.sidebar.radio(key='dashboard_section').set_value('Clock Performance').run()
     app.sidebar.radio(key='dashboard_mode').set_value('Research Mode').run()
     assert not app.exception

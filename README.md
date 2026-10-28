@@ -6,6 +6,10 @@ Demonstration Mode for the guided view; select Research Mode for scientific
 controls. All original tools remain under Advanced Research, and the photon-clock
 experiment also opens directly from Clock Performance. Overview does not run a
 simulation. See the [feature inventory and navigation guide](docs/DASHBOARD_REDESIGN.md).
+**Part 2:** NV-Center Demonstration now contains a rotatable Plotly diamond lattice,
+one nitrogen/vacancy pair, NV-axis overlays and low-field vector controls. This is
+educational geometry, independent of all ODMR/clock calculations. See
+[geometry, controls and limitations](docs/NV_VISUALIZATION.md).
 The scientific scope paragraphs below describe their respective original phases;
 the Phase 4 section describes the implemented closed-loop photon-clock simulation.
 
