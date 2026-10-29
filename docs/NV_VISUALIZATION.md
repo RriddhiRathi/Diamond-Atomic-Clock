@@ -1,5 +1,10 @@
 # Interactive NV visualization — dashboard redesign Part 2
 
+**Part 3 update:** the same geometry now sits alongside a cached ODMR spectrum.
+Field controls feed that existing engine, while optical/clock experiments stay
+separate. The Part 2 description below records the original geometry feature;
+see [current integration](NV_ODMR_DEMONSTRATION.md) for the updated behavior.
+
 Run the existing `python -m streamlit run app.py`, select **Demonstration Mode**
 and **NV-Center Demonstration**. Research Mode offers the same educational page;
 its controls remain independent of the scientific experiment workspaces.

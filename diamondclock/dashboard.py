@@ -1,4 +1,4 @@
-"""Part 1 dashboard shell. Navigation never starts a scientific calculation."""
+"""Dashboard shell. Clock/optical experiments retain their explicit run controls."""
 import sqlite3
 
 import streamlit as st

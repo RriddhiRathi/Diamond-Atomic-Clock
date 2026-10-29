@@ -1,4 +1,4 @@
-"""The 3D page remains educational and cannot trigger the scientific experiments."""
+"""The 3D page reuses spectroscopy without triggering optical/clock experiments."""
 from pathlib import Path
 
 from streamlit.testing.v1 import AppTest
@@ -19,8 +19,8 @@ def test_nv_page_controls_reset_and_navigation_without_simulation(monkeypatch):
     app = AppTest.from_file(str(Path(__file__).resolve().parents[1] / 'app.py'), default_timeout=60).run()
     app.sidebar.radio(key='dashboard_section').set_value('NV-Center Demonstration').run()
     assert not app.exception
-    assert len(app.get('plotly_chart')) == 1
-    assert any('do not run ODMR' in item.value for item in app.info)
+    assert len(app.get('plotly_chart')) == 2
+    assert any('do not run optical-cycle or clock' in item.value for item in app.info)
     assert not any('reserved for later' in item.value for item in app.info)
     app.selectbox(key='nv_orientation').set_value(1)
     app.slider(key='nv_angle').set_value(60.)

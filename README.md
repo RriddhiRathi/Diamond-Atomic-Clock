@@ -10,6 +10,10 @@ simulation. See the [feature inventory and navigation guide](docs/DASHBOARD_REDE
 one nitrogen/vacancy pair, NV-axis overlays and low-field vector controls. This is
 educational geometry, independent of all ODMR/clock calculations. See
 [geometry, controls and limitations](docs/NV_VISUALIZATION.md).
+**Part 3:** that page now adds the existing engine's ODMR spectrum, a cached
+microwave-frequency selector and optional static excitation/readout overlays.
+The detailed optical-cycle and closed-loop clock models remain separate.
+See [integration and scientific limits](docs/NV_ODMR_DEMONSTRATION.md).
 The scientific scope paragraphs below describe their respective original phases;
 the Phase 4 section describes the implemented closed-loop photon-clock simulation.
 

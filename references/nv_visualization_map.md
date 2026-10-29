@@ -33,7 +33,7 @@ The drawn B arrow is parallel to this actual lab vector. The displayed angle is
 and **1 G = 10⁻⁴ T**. At B=0 the direction/angle is undefined and no B arrow
 is drawn. The default is aligned 20 G at nominal 297 K; only 0–50 G is offered.
 Off-axis controls are geometric, not an extension of the validated axial optical
-clock domain. Changing these controls never runs or updates an ODMR/clock experiment.
+clock domain. In Part 3 these controls update the adjacent cached ODMR proxy, using the same lab vector. They never run an optical-cycle or clock experiment.
 
 ### Conceptual educational explanation
 
@@ -47,7 +47,7 @@ level shifts, a spectrum, photon counts, charge density or quantum dynamics.
 
 ### Actual simulated numerical results
 
-These remain in **Advanced Research** and **Clock Performance**. The 3D page's
+These remain in **Advanced Research** and **Clock Performance**. The 3D geometry view's
 only numerical quantities are crystal coordinates and field-vector geometry;
 they are not simulated clock results or experimental imaging. Atom radii, colors
 and vector lengths are schematic. The finite cluster is not a macroscopic crystal
@@ -56,3 +56,5 @@ or a modeled surface. The default neighborhood is a crop of the same context.
 Implementation and tests: `nv_visualization.py` (basis, connectivity, defect,
 frames, vectors, Plotly); `nv_dashboard.py` (UI only);
 `tests/test_nv_visualization.py`, `tests/test_app_nv.py`.
+
+Part 3 adds a separate simulated ODMR panel; see `references/nv_odmr_demo_map.md`.

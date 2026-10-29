@@ -13,7 +13,7 @@ exposes the existing scientific forms. Switching modes never submits a form.
 | Section | Part 1 contents | Later redesign work |
 |---|---|---|
 | Clock Overview | Research objective, scientific sequence, starting configuration, validated last-run clock metrics and conditional interpretation | Consolidated configuration and deeper interpretation |
-| NV-Center Demonstration | Part 2 now adds a rotatable diamond lattice, one N/vacancy pair, four NV-axis overlays and geometric field controls; see [NV_VISUALIZATION.md](NV_VISUALIZATION.md) | Live ODMR/fluorescence integration in Part 3; any optical animation must be labeled schematic |
+| NV-Center Demonstration | Part 2 now adds a rotatable diamond lattice, one N/vacancy pair, four NV-axis overlays and geometric field controls; see [NV_VISUALIZATION.md](NV_VISUALIZATION.md) | Part 3 now adds the existing ODMR proxy and static optical/MW cartoons; detailed optical-cycle coupling remains separate |
 | Clock Performance | Existing photon-clock controls/results/exports in Research Mode; read-only completed-run metrics and shared full-record Allan plot in Demonstration Mode | Focused acquisition, correction, lock, phase/time and stability layout |
 | Advanced Research | All existing tools, grouped into four workspaces, available in Research Mode | Progressive disclosure of detailed controls |
 
@@ -54,7 +54,9 @@ original 475 G stability scenario. No model domains or defaults were changed.
 
 ## Computation and persistence
 
-Overview, Demonstration and Demo Performance never calculate a simulation. Only
+Overview and Demo Performance never calculate a simulation. Since Part 3, NV-Center
+Demonstration reuses the cached ODMR engine for field/orientation changes; frequency
+and view changes reuse its grid. It never runs optical-cycle or clock experiments. Only
 the selected Research workspace renders; hidden ODMR/optical/clock forms do not
 execute. The original stability workspace still loads its source-cached baseline
 when explicitly opened. Ensembles, other experiments and exports require their

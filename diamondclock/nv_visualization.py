@@ -136,7 +136,7 @@ def _arrow(fig, origin, direction, color, name, length=1.05, width=7):
 
 
 def crystal_figure(cluster, field_G, *, context=False, bonds=True, orientations=False,
-                   atom_labels=False, bond_labels=False, camera_revision=0):
+                   atom_labels=False, bond_labels=False, camera_revision=0, show_field=True):
     """Educational geometry in (r-r_N)/a; arrows have schematic lengths."""
     field = vector(field_G)
     positions = cluster.sites - cluster.nitrogen
@@ -188,7 +188,7 @@ def crystal_figure(cluster, field_G, *, context=False, bonds=True, orientations=
                 name='Other NV orientations', showlegend=k == next(j for j in range(4) if j != cluster.orientation),
                 hovertemplate=ORIENTATION_LABELS[k] + '<extra>Alternative orientation, not another defect</extra>'))
     _arrow(fig, np.zeros(3), cluster.axis, '#30d5c8', 'Selected NV axis · N → V', width=9)
-    if np.linalg.norm(field) > 0:
+    if show_field and np.linalg.norm(field) > 0:
         _arrow(fig, np.zeros(3), field, '#f8d16b', 'B · external field', length=1.25, width=4)
     metrics = field_metrics(field, cluster.axis)
     bounds = [-1.45, 1.75] if context else [-1.35, 1.35]
@@ -203,4 +203,26 @@ def crystal_figure(cluster, field_G, *, context=False, bonds=True, orientations=
         meta=dict(illustration='Ideal crystal geometry; no quantum simulation',
                   occupied_sites=len(cluster.sites), visible_atoms=int(visible.sum()),
                   vacancy_count=1, field_G=field.tolist(), **metrics))
+    return fig
+
+
+def measurement_overlays(fig, cluster, *, laser=True, microwave=True, signal=None, enabled=True):
+    """Static cartoons only; emission opacity follows the selected proxy readout."""
+    if not enabled:
+        return fig
+    center = (cluster.vacancy-cluster.nitrogen)/2
+    if laser:
+        start = np.array([-.9, -.8, .8])
+        _arrow(fig, start, center-start, '#44df71', 'Schematic optical excitation',
+               length=float(np.linalg.norm(center-start)))
+        if signal is not None:
+            if not np.isfinite(signal) or not 0 <= signal <= 1:
+                raise ValueError('Schematic fluorescence requires a normalized signal in [0,1].')
+            _arrow(fig, center, np.array([.8, .3, .7]), '#ff5566',
+                   'Schematic fluorescence · scaled proxy', length=.85)
+            for trace in fig.data[-2:]:
+                trace.opacity = float(signal)
+    if microwave:
+        start = np.array([.7, -.7, 0])
+        _arrow(fig, start, center-start, '#bf89ef', 'Schematic microwave drive', length=.6)
     return fig
