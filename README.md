@@ -209,3 +209,12 @@ The six navigation pages are **Overview**, **NV-Center & ODMR**, **Clock Perform
 **Research Tools**, **Paper Bucket**, and **Exports & Documentation**. No mode switch
 is required. All expensive experiments, including Stability & compensation, run only
 on explicit submission. See [dashboard use and validation](docs/DASHBOARD_UX.md).
+
+**Atomic Clock Comparison** adds one contextual table and graph alongside the
+existing pages. It compares the original seven-state saved simulation with NIST
+representative cesium-beam, rubidium-cell and hydrogen-maser stability values.
+Literature points retain their qualifiers; they are not matched experimental tests
+or evidence that the simulated NV reference matches conventional clocks.
+See the [value-to-source map](references/clock_comparison_map.md), also available in
+Paper Bucket → Equation maps → Atomic clock comparison. No simulation runs when
+opening this page.

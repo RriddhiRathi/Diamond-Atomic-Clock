@@ -280,5 +280,20 @@
     "locator": "Online Diamond A4 entry: cF8, space group 227; primitive and basis vectors",
     "implementation": "diamondclock/nv_visualization.py; references/nv_visualization_map.md",
     "note": "Online structure entry and its cited bibliography checked. The project uses a translated-origin equivalent FCC + (1/4,1/4,1/4) construction, also explicitly documented by TU Wien node27.html. No numerical lattice constant, relaxed NV geometry or experimental imaging data is imported. Full journal text not independently reviewed in this step."
+  },
+  {
+    "id": "NIST_ATOZ",
+    "title": "Time and Frequency from A to Z: An Illustrated Glossary",
+    "authors": "NIST Time and Frequency Division",
+    "year": 2010,
+    "journal": "NIST online glossary (living reference; linked PDF undated)",
+    "doi": null,
+    "url": "https://tf.nist.gov/general/pdf/1548.pdf",
+    "evidence": "Authoritative metrology glossary; representative values, not a new device measurement campaign",
+    "verified": "2026-10-29",
+    "locator": "Cesium Beam Oscillator, printed p.8; Hydrogen Maser, p.25; Rubidium Oscillator, p.41; Allan Deviation, p.2; Stability, p.43",
+    "implementation": "references/clock_comparison.json; references/clock_comparison_map.md; diamondclock/clock_comparison.py",
+    "verification_scope": "Three comparison values, qualifiers and platform descriptions checked against PDF and NIST web entries",
+    "note": "Web entries created May 12, 2010 and updated March 1, 2023; year denotes original web publication, not a dated PDF edition. Reviewed 2026-10-29. Cs beam approximately 5e-12 and Rb approximately 1e-11 at 1 s; H maser typically less than 1e-12 at 1 s. Rounded guide values; no raw data, per-device estimator/confidence detail or universal performance guarantee. Not used as NV model parameters or experimental validation."
   }
 ]

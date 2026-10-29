@@ -1,0 +1,50 @@
+{
+  "reviewed_on": "2026-10-29",
+  "scope": "Literature/context comparison; not direct experimental validation",
+  "nv_example": {
+    "id": "DC7",
+    "source_id": "MODEL",
+    "bundle": "outputs/clock_phase4_20261024/7/complete_research_bundle.zip",
+    "bundle_sha256": "7824c92e8274413cab1d8b7911c2556df02eec0b1c94d10d835a49579367684f",
+    "analysis": "full record",
+    "summary_tau": "longest valid exactly matched averaging time; no interpolation"
+  },
+  "literature_points": [
+    {
+      "clock_type": "Cesium beam",
+      "platform": "133Cs microwave beam reference (~9.193 GHz)",
+      "metric": "Reported fractional stability; rounded typical guide value",
+      "tau_s": 1.0,
+      "value": 5e-12,
+      "relation": "approximately",
+      "note": "Commercial beam standard; not a cesium fountain or technology-wide guarantee",
+      "source_id": "NIST_ATOZ",
+      "locator": "Cesium Beam Oscillator, printed p.8 / PDF page 8",
+      "url": "https://www.nist.gov/pml/time-and-frequency-division/popular-links/time-frequency-z/time-and-frequency-z-c-ce"
+    },
+    {
+      "clock_type": "Rubidium cell",
+      "platform": "87Rb vapor-cell microwave reference (~6.83 GHz)",
+      "metric": "Reported fractional stability; rounded typical guide value",
+      "tau_s": 1.0,
+      "value": 1e-11,
+      "relation": "approximately",
+      "note": "Common compact frequency reference; specific devices can differ",
+      "source_id": "NIST_ATOZ",
+      "locator": "Rubidium Oscillator, printed p.41 / PDF page 41",
+      "url": "https://www.nist.gov/pml/time-and-frequency-division/popular-links/time-frequency-z/time-and-frequency-z-re-ru"
+    },
+    {
+      "clock_type": "Hydrogen maser",
+      "platform": "H microwave maser (~1.420 GHz)",
+      "metric": "Reported fractional stability; typical upper bound",
+      "tau_s": 1.0,
+      "value": 1e-12,
+      "relation": "less_than",
+      "note": "Laboratory frequency reference; marker denotes a bound, not an exact measured point",
+      "source_id": "NIST_ATOZ",
+      "locator": "Hydrogen Maser, printed p.25 / PDF page 25",
+      "url": "https://www.nist.gov/pml/time-and-frequency-division/popular-links/time-frequency-z/time-and-frequency-z-h"
+    }
+  ]
+}

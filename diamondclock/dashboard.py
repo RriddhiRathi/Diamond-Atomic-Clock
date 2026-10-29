@@ -1,7 +1,7 @@
 """Unified dashboard navigation; experiments run only on explicit submission."""
 import streamlit as st
 
-SECTIONS = ('Overview','NV-Center & ODMR','Clock Performance','Research Tools','Paper Bucket','Exports & Documentation')
+SECTIONS = ('Overview','NV-Center & ODMR','Clock Performance','Atomic Clock Comparison','Research Tools','Paper Bucket','Exports & Documentation')
 WORKSPACES = ('Stability & compensation','ODMR spectroscopy','Optical measurement','Frequency lock')
 OLD_SECTIONS = {'Clock Overview':'Overview','NV-Center Demonstration':'NV-Center & ODMR','Advanced Research':'Research Tools'}
 
@@ -68,7 +68,7 @@ def render_overview():
     a,b,c=st.columns(3)
     a.button('NV center & ODMR',key='nav_nv',on_click=navigate,args=(SECTIONS[1],),width='stretch')
     b.button('Clock performance',key='nav_performance',on_click=navigate,args=(SECTIONS[2],),width='stretch')
-    c.button('Research tools',key='nav_research',on_click=navigate,args=(SECTIONS[3],),width='stretch')
+    c.button('Research tools',key='nav_research',on_click=navigate,args=(SECTIONS[4],),width='stretch')
     saved=completed_clock()
     if saved is None:
         with st.container(border=True):
@@ -132,8 +132,11 @@ def render_dashboard():
         from .nv_dashboard import render_nv_demonstration
         render_nv_demonstration()
     elif section==SECTIONS[2]:render_performance()
-    elif section==SECTIONS[3]:render_research()
-    elif section==SECTIONS[4]:
+    elif section==SECTIONS[3]:
+        from .clock_comparison import render_comparison
+        render_comparison()
+    elif section==SECTIONS[4]:render_research()
+    elif section==SECTIONS[5]:
         from .research_pages import render_paper_bucket
         render_paper_bucket()
     else:

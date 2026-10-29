@@ -14,7 +14,7 @@ from .run_provenance import source_fingerprint, validate, verify_files
 
 MAPS = {'Stability & compensation':'equation_map.md', 'ODMR spectroscopy':'odmr_equation_map.md',
         'Optical readout':'optical_equation_map.md', 'Oscillator & feedback':'clock_equation_map.md',
-        'NV crystal geometry':'nv_visualization_map.md', 'Interactive ODMR':'nv_odmr_demo_map.md'}
+        'NV crystal geometry':'nv_visualization_map.md', 'Interactive ODMR':'nv_odmr_demo_map.md','Atomic clock comparison':'clock_comparison_map.md'}
 DOCUMENTS = {'Clock methods':'CLOCK_METHODS.md', 'Clock validation':'CLOCK_VALIDATION.md',
              'Clock results & reproduction':'CLOCK_PERFORMANCE.md', 'Stability methodology':'METHODOLOGY.md',
              'ODMR methods':'ODMR_METHODS.md', 'Optical methods':'OPTICAL_METHODS.md',
