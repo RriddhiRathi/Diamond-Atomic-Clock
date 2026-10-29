@@ -5,6 +5,7 @@ import json
 import numpy as np
 import plotly.graph_objects as go
 import streamlit as st
+from .plot_style import scientific_plot, CHART_CONFIG
 from .odmr import ODMRConfig, spherical, transform, odmr_parameter_provenance
 from .odmr_bridge import ReadoutScenario
 from .odmr_reporting import calculate, export_odmr
@@ -22,7 +23,7 @@ def cached_odmr(values, clock_values, readout_values, fingerprint):
 
 def render_odmr(clock_config, fingerprint, paper_bucket, reference_error=None):
     st.subheader('ODMR spectroscopy')
-    st.info('SIMULATION · Four NV orientations, electron + nitrogen-14 ground states. Fluorescence is a transition-strength proxy with assumed contrast and Lorentzian linewidth, not an optical pumping calculation.')
+    st.caption('SIMULATION · Four NV orientations, electron + nitrogen-14 ground states. Fluorescence is a transition-strength proxy with assumed contrast and Lorentzian linewidth, not an optical pumping calculation.')
     with st.form('odmr_controls'):
         a,b,c=st.columns(3)
         field=a.number_input('ODMR magnetic magnitude (G)',0.,650.,18.,key='odmr_B')
@@ -95,7 +96,7 @@ def render_odmr(clock_config, fingerprint, paper_bucket, reference_error=None):
         fig.add_trace(go.Scatter(x=data.frequency_Hz/1e6,y=data[f'NV{k}_fluorescence'],name=f'NV{k}',line=dict(color=color,width=1)))
     fig.add_trace(go.Scatter(x=data.frequency_Hz/1e6,y=data.combined_fluorescence,name='Weighted ensemble',line=dict(color='#eeeeee',width=2.5)))
     fig.update_layout(template='plotly_dark',xaxis_title='Microwave frequency (MHz)',yaxis_title='Normalized fluorescence (model)',height=480)
-    st.plotly_chart(fig,width='stretch',key='odmr_spectrum_plot')
+    st.plotly_chart(scientific_plot(fig),width='stretch',config=CHART_CONFIG,key='odmr_spectrum_plot')
     if (values.stop_Hz-values.start_Hz)/(values.points-1)>values.linewidth_Hz/5:
         st.warning('Frequency grid is coarse relative to FWHM. Narrow the window or increase points; peak depth may be under-resolved.')
     selected=st.selectbox('NV orientation for level and sensitivity tables',[1,2,3,4],key='odmr_level_nv')
@@ -104,7 +105,7 @@ def render_odmr(clock_config, fingerprint, paper_bucket, reference_error=None):
         part=sweep[(sweep.orientation==selected)&(sweep.energy_rank==rank)]
         fig.add_trace(go.Scatter(x=part.field_G,y=part.energy_Hz/1e6,name=f'Energy rank {rank}',mode='lines'))
     fig.update_layout(template='plotly_dark',xaxis_title='Field magnitude along selected direction (G)',yaxis_title='Energy / h above lowest level (MHz)',height=440)
-    st.plotly_chart(fig,width='stretch',key='odmr_levels_plot')
+    st.plotly_chart(scientific_plot(fig),width='stretch',config=CHART_CONFIG,key='odmr_levels_plot')
     st.caption('Energy ranks can exchange spin character at crossings; these curves do not claim state tracking. Degenerate transition manifolds are summed before constructing spectra.')
     st.dataframe(result['sensitivities'].query('orientation == @selected'),hide_index=True,width='stretch')
     if 'comparison' in result:
@@ -119,7 +120,7 @@ def render_odmr(clock_config, fingerprint, paper_bucket, reference_error=None):
                 part=a[(a.method==method)&(a.scenario==scenario)&(a.adev>0)]
                 fig.add_trace(go.Scatter(x=part.tau_s,y=part.adev,name=METHODS[method]+' · '+scenario,line=dict(dash=dash)))
         fig.update_layout(template='plotly_dark',xaxis_type='log',yaxis_type='log',xaxis_title='Averaging time (s)',yaxis_title='Overlapping Allan deviation',height=500)
-        st.plotly_chart(fig,width='stretch',key='odmr_comparison_plot')
+        st.plotly_chart(scientific_plot(fig),width='stretch',config=CHART_CONFIG,key='odmr_comparison_plot')
         st.caption('SIMULATED paired records, not experimental confidence intervals. DRE2011 Eq. (3) supplies an ideal resolved-line photon-noise estimate; linewidth, contrast and rate are assumptions. This comparison can worsen stability and does not establish clock accuracy.')
         st.json(d,expanded=False)
     st.dataframe(odmr_parameter_provenance(values),hide_index=True,width='stretch')

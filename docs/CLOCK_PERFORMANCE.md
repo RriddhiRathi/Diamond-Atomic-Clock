@@ -6,7 +6,7 @@ are **SIMULATION**, not experimental NV-clock performance or SI accuracy.
 
 ## One experiment and its evidence
 
-Clock Overview reads the last successfully completed current-session clock result.
+Overview reads the last successfully completed current-session clock result.
 It does not run a simulation. Its compact cards show the observed lock fraction,
 public nominal frequency in GHz, feedback endpoint time error in µs, paired feedback
 and free-running fractional-frequency Allan deviations, and their dimensionless
@@ -17,16 +17,15 @@ backend, field, temperature, gate, seed, requested/completed cycles, record dura
 and free-running endpoint error accompany the cards. Missing values are unavailable.
 
 The empty state offers configuration or existing saved experiments. Three workflow
-links lead to NV/ODMR, clock evidence and Advanced Research. The Part 3 phenomenological
+links lead to NV/ODMR, clock evidence and Research Tools. The Part 3 phenomenological
 ODMR demonstration is educational and independent of the Phase 4 optical-count loop;
 its slider is not a clock lock measurement.
 
 Clock Performance offers a current-session run or a verified historical example.
-Demonstration Mode shows the five evidence sections without simulation controls.
-Research Mode retains the original seven/21-state configuration form inside an
+The unified page shows the five evidence sections and retains the original seven/21-state configuration form inside an
 expander, every diagnostic table, configuration/source metadata, Paper Bucket-backed
 export, full research ZIP and individual original SVG/PDF figure downloads.
-Advanced Research → Frequency lock retains the same workspace and state.
+Research Tools → Frequency lock retains the same workspace and state.
 
 1. **Acquisition:** actual simulated photon counts versus commanded probe offset;
    count-fitted centre, reported sigma and nominal 95% profile interval when accepted.
@@ -101,7 +100,7 @@ recompute them. The current-session view and original CLI/export path remain usa
 
 ## State and provenance
 
-Navigation, modes, window, τ and diagnostic selection never call `calculate_clock`.
+Navigation, window, τ and diagnostic selection never call `calculate_clock`.
 Only the explicit form submission does. Cached runs reuse the original configuration
 and source fingerprint. A failed new calculation keeps the last successful result.
 Browser form edits do not reach Python before submission. When server-side controls
@@ -126,8 +125,7 @@ python -m streamlit run app.py --server.port 8502
 ```
 
 Open `http://localhost:8502`. Overview → Browse saved experiments provides immediate
-evidence without recomputation. To calculate a new run, choose Research Mode →
-Clock Performance → Current session run → Configure a photon-clock experiment →
+evidence without recomputation. To calculate a new run, choose Clock Performance → Current session run → Configure a photon-clock experiment →
 Simulate photon-based clock. Prepare the research bundle explicitly when needed.
 Use the same activated environment for `python -m pytest -q`.
 

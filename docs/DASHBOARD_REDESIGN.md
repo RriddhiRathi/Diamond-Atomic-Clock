@@ -94,3 +94,11 @@ explicit form, caching, diagnostic tables and original research exporter. Naviga
 and pending input edits preserve the last completed run, its provenance and exports.
 No optical/clock calculation occurs on presentation or navigation; the Part 3 ODMR
 cache behavior remains unchanged. Parts 1–3 and all scientific workspaces are retained.
+
+## Unified navigation refinement
+
+The earlier Part 1–4 sections document development history. The current six-page
+UI removes the mode gate, exposes Paper Bucket and Exports & Documentation directly,
+and requires explicit submission for the original stability workspace. Current use,
+state migration, plot presentation and visual-validation limits are documented in
+[DASHBOARD_UX.md](DASHBOARD_UX.md). Scientific models and archived outputs are retained.

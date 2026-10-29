@@ -22,16 +22,15 @@ def test_empty_overview_navigation_and_historical_results_do_not_run_clock(monke
     assert 'clock_result' not in app.session_state
     app.selectbox(key='clock_archive_case').set_value('Lock with worse stability · quieter oscillator').run()
     assert not app.exception
-    assert any('worsens stability' in item.value for item in app.info)
+    assert any('worsens stability' in item.value for item in app.markdown)
     app.radio(key='clock_analysis_window').set_value('Predeclared fixed window').run()
     assert not app.exception
-    assert any('predeclared fixed window' in item.value.lower() for item in app.info)
-    app.sidebar.radio(key='dashboard_mode').set_value('Research Mode').run()
+    assert any('predeclared fixed window' in item.value.lower() for item in app.markdown)
     assert not app.exception and app.button(key='run_clock')
     assert 'clock_result' not in app.session_state
-    app.sidebar.radio(key='dashboard_section').set_value('Clock Overview').run()
+    app.sidebar.radio(key='dashboard_section').set_value('Overview').run()
     app.button(key='nav_research').click().run()
-    assert app.sidebar.radio(key='dashboard_section').value=='Advanced Research'
+    assert app.sidebar.radio(key='dashboard_section').value=='Research Tools'
     # Select original workspace without calculating a clock on navigation.
     app.selectbox(key='research_workspace').set_value('Frequency lock').run()
     assert not app.exception and app.button(key='run_clock')
@@ -70,7 +69,6 @@ def test_failed_submission_preserves_last_successful_run_and_uses_saved_config(m
     clock_dashboard.cached_clock.clear()
     app=AppTest.from_file(APP,default_timeout=60).run()
     app.session_state['clock_result']=saved
-    app.sidebar.radio(key='dashboard_mode').set_value('Research Mode').run()
     app.sidebar.radio(key='dashboard_section').set_value('Clock Performance').run()
     assert not app.exception and len(app.metric)==6
     assert any('completed-run configuration' in item.value for item in app.warning)

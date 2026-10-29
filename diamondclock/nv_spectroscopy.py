@@ -3,6 +3,7 @@ from dataclasses import asdict
 import numpy as np
 import streamlit as st
 import plotly.graph_objects as go
+from .plot_style import scientific_plot, CHART_CONFIG
 from .odmr import ODMRConfig, spectrum, transform, vector
 from .physics import Physics, thermal_parameters
 from .optical_parameters import OpticalConfig
@@ -80,7 +81,7 @@ def spectrum_figure(data, lines, config, orientation, frequency_Hz, *, laser=Tru
                 fig.add_scatter(x=data.frequency_Hz/1e9, y=data[f'NV{k+1}_fluorescence'],
                     name=f'NV{k+1} · comparison', line=dict(width=1), opacity=.45)
     fig.add_scatter(x=data.frequency_Hz/1e9, y=data.combined_fluorescence,
-        name=f'NV{orientation+1} · simulated MW-on proxy', line=dict(color='#30d5c8', width=2))
+        name=f'NV{orientation+1} · MW-on proxy', line=dict(color='#30d5c8', width=2))
     fig.add_vline(x=frequency_Hz/1e9, line_color='#ffb454')
     if signal is not None:
         fig.add_scatter(x=[frequency_Hz/1e9], y=[signal], mode='markers',
@@ -91,13 +92,22 @@ def spectrum_figure(data, lines, config, orientation, frequency_Hz, *, laser=Tru
     fig.add_scatter(x=active.frequency_Hz/1e9,
         y=[float(data.combined_fluorescence.min())]*len(active), mode='markers',
         marker=dict(symbol='line-ns', color='#c7d8e8'),
-        name='Calculated transition centers (may overlap)',
+        name='Calculated transition centers',
         hovertemplate='%{x:.9f} GHz<extra>Hamiltonian transition, not a fitted dip minimum</extra>')
     fig.update_layout(height=370, template='plotly_dark', xaxis_title='Microwave frequency (GHz)',
         yaxis_title='Normalized fluorescence proxy', margin=dict(t=10, b=30),
         legend=dict(orientation='h', font=dict(size=10)),
         meta=dict(model='odmr.spectrum', field_G=config['B_lab_G'], orientation=orientation,
                   frequency_Hz=frequency_Hz, interpolated_response=response, displayed_signal=signal))
+    return scientific_plot(fig,height=490)
+
+
+def spectrum_view(fig, config, frequency_Hz, zoom=False):
+    """Change viewport only; actual grid, dip widths and contrast stay unchanged."""
+    if zoom:
+        halfwidth=5*config['linewidth_Hz']
+        fig.update_xaxes(range=[max(config['start_Hz'],frequency_Hz-halfwidth)/1e9,
+                                min(config['stop_Hz'],frequency_Hz+halfwidth)/1e9])
     return fig
 
 
@@ -114,7 +124,8 @@ def render_spectrum(field, orientation):
     value = float(np.clip(st.session_state.get(key, default), lo, hi))
     if key not in st.session_state or st.session_state[key] != value:
         st.session_state[key] = value
-    st.markdown('**Simulated ODMR · selected NV**')
+    st.markdown('**ODMR spectrum · selected NV**')
+    plot_area=st.container()
     frequency = st.slider('Microwave frequency (GHz)', lo, hi, step=1e-7, format='%.7f', key=key)
     frequency_Hz = bounded_frequency(data, frequency*1e9)
     response = fluorescence(data, frequency_Hz)
@@ -125,7 +136,14 @@ def render_spectrum(field, orientation):
     fig = spectrum_figure(data, lines, config, orientation, frequency_Hz,
         laser=laser, microwave=microwave,
         other_orientations=st.session_state.get('nv_other_spectra', False))
-    st.plotly_chart(fig, width='stretch', key='nv_odmr_plot')
+    view=st.selectbox('Spectrum view',['Full spectrum','Around microwave selector'],key='nv_spectrum_view')
+    spectrum_view(fig,config,frequency_Hz,view!='Full spectrum')
+    with plot_area:
+        st.plotly_chart(fig, width='stretch', key='nv_odmr_plot',config=CHART_CONFIG)
+    st.markdown(f'**Microwave: {frequency_Hz/1e9:.9f} GHz**')
+    if view!='Full spectrum':
+        limits=fig.layout.xaxis.range
+        st.caption(f'Zoom: {limits[0]:.9f}–{limits[1]:.9f} GHz (selector ±5 FWHM, clipped to computed grid). Original spectral data are unchanged.')
     st.metric('Normalized fluorescence', 'Not modeled · laser off' if signal is None else f'{signal:.6f}')
     if signal is not None:
         st.caption(f'Relative decrease from the model MW-off reference: {100*(1-signal):.3f}%')
@@ -135,7 +153,7 @@ def render_spectrum(field, orientation):
     with st.expander('Model parameters, optical domain and provenance'):
         supported, note = optical_scope(field, orientation)
         st.info(note)
-        st.write('Seven/21-state Lindblad/rate calculations remain separate in Advanced Research → Optical measurement. '
+        st.write('Seven/21-state Lindblad/rate calculations remain separate in Research Tools → Optical measurement. '
                  'No automatic detailed readout is performed, even within the supported domain. '
                  'Laser-off emission is undefined here; no zero photon rate is claimed.')
         st.caption('Existing nine-state ground Hamiltonian and Lorentzian transition-strength proxy '

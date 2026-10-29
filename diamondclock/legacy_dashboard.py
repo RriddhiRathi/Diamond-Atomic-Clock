@@ -1,18 +1,16 @@
 """Original stability workspaces, rendered only when explicitly selected."""
 from dataclasses import asdict
 import json
-import sqlite3
-import hashlib
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import streamlit as st
+from .plot_style import scientific_plot, CHART_CONFIG
 from diamondclock.simulation import Config, METHODS, simulate, ensemble
 from diamondclock.physics import Physics
-from diamondclock.reporting import (ROOT,COLORS,sources,provenance,benchmarks,export_files,zip_files)
+from diamondclock.reporting import (ROOT,COLORS,benchmarks,export_files,zip_files)
 
-from diamondclock.reference_store import ReferenceStore, verification_label, catalog_bytes, bibtex_bytes
 from diamondclock.run_provenance import capture, validate, source_fingerprint
 
 @st.cache_data(show_spinner=False)
@@ -31,8 +29,8 @@ def cached_ensemble(values,count,fingerprint):
 
 
 def render_legacy():
-    with st.sidebar:
-        st.markdown('### Experiment controls')
+    with st.expander('Configure stability experiment',expanded=False):
+        st.markdown('**Experiment controls**')
         st.caption('All noise settings are assumptions; physical coefficients come from Lourette 2023.')
         with st.form('controls'):
             n=st.selectbox('Number of samples',[4096,8192,16384,32768,65536,131072],index=3,key='legacy_number_of_samples')
@@ -61,7 +59,7 @@ def render_legacy():
                 low=st.number_input('White FM ADEV at 1 s (×10⁻⁹)',0.,10000.,1.,format='%.3f',key='legacy_white_fm_adev_at_1_s_10')
                 lorw=st.number_input('Random-walk diffusion (×10⁻¹¹ /√s)',0.,1000.,1.,format='%.3f',key='legacy_random_walk_diffusion_10_s')
                 lodrift=st.number_input('Oscillator drift (×10⁻¹³ /s)',-100.,100.,0.,format='%.3f',key='legacy_oscillator_drift_10_s')
-            st.form_submit_button('Run simulation',type='primary',width='stretch')
+            submitted=st.form_submit_button('Run simulation',type='primary',width='stretch',key='run_legacy')
         c=Config(n=int(n),dt_s=dt,seed=int(seed),temp_rms_K=temp,temp_corr_s=corr,temp_sine_K=sine,
                  temp_period_s=period,temp_drift_K_h=drift,Bz_G=bias,Bx_G=bx,Bz_rms_G=brms/1000,
                  Bx_rms_G=bxrms/1000,B_corr_s=bcorr,electron_readout_Hz=er,nuclear_readout_Hz=nr,
@@ -70,13 +68,29 @@ def render_legacy():
                  lo_drift_per_s=lodrift*1e-13)
         st.session_state['legacy_config']=asdict(c)
 
+    fingerprint=source_fingerprint()
+    if submitted:
+        try:
+            with st.spinner('Calculating stability and compensation…'):
+                value=cached_run(asdict(c),fingerprint)
+                validate(value[3])
+                st.session_state['legacy_result']=((asdict(c),fingerprint),value)
+        except ValueError as exc:st.error(str(exc))
+    saved_run=st.session_state.get('legacy_result')
+    if saved_run is None:
+        st.caption('Configure the experiment and select Run simulation. Opening this workspace does not calculate a record.')
+        return
     try:
-        with st.spinner('Solving the spin Hamiltonian and calculating overlapping Allan deviation…'):
-            fingerprint=source_fingerprint()
-            trace,a,diag,run_context=cached_run(asdict(c),fingerprint)
-            validate(run_context)
-    except ValueError as exc:
-        st.error(str(exc));st.stop()
+        saved_key,(trace,a,diag,run_context)=saved_run
+        validate(run_context)
+        if run_context['config']!=saved_key[0] or run_context['physics']!=asdict(Physics()):
+            raise ValueError('Completed stability configuration differs from captured calculation.')
+        if saved_key[1]!=fingerprint:raise ValueError('Source changed. Run the stability experiment again.')
+    except (ValueError,KeyError,TypeError) as exc:
+        st.warning(str(exc));return
+    if saved_key!=(asdict(c),fingerprint):
+        st.warning('Controls differ from the completed stability run. Results and exports retain that run’s configuration.')
+    c=Config(**saved_key[0])
 
     grid=a[a.method=='composite']
     target=grid.iloc[(grid.tau_s-200).abs().argmin()]
@@ -99,19 +113,19 @@ def render_legacy():
         for (key,label),color in zip(METHODS.items(),COLORS):
             if key in selected:
                 part=a[a.method==key]
-                fig.add_trace(go.Scatter(x=part.tau_s,y=part.adev,mode='lines+markers',name=label+' · simulation',line_color=color,
+                fig.add_trace(go.Scatter(x=part.tau_s,y=part.adev,mode='lines+markers',name=label+' · simulation',line=dict(color=color,dash=['solid','dash','dot','dashdot','longdash'][list(METHODS).index(key)]),marker_symbol=['circle','diamond','square','triangle-up','cross'][list(METHODS).index(key)],
                                         customdata=part.overlapping_pairs,hovertemplate='τ=%{x:g} s<br>ADEV=%{y:.3e}<br>Overlapping pairs=%{customdata}<extra>%{fullData.name}</extra>'))
         if show_published:
             b=benchmarks();b=b[b.tau_s<=a.tau_s.max()]
             fig.add_trace(go.Scatter(x=b.tau_s,y=b.adev_limit,mode='markers',name='Lourette 2026 · measured upper limits (<)',
-                                     marker=dict(symbol='triangle-down-open',size=14,color='black')))
+                                     marker=dict(symbol='triangle-down-open',size=12,color='#f2f5f7')))
         if show_projections:
             tau=np.geomspace(a.tau_s.min(),a.tau_s.max(),100)
             for level,title in [(1e-7,'Thermal projection'),(1e-12,'Ideal projection')]:
                 fig.add_trace(go.Scatter(x=tau,y=level/np.sqrt(tau),name='Hodges 2013 · '+title,line=dict(dash='dot',color='#aaaaaa')))
         fig.update_layout(template='plotly_dark',height=560,xaxis_title='Averaging time τ (s)',yaxis_title='Overlapping Allan deviation σy(τ)',
                           xaxis_type='log',yaxis_type='log',legend=dict(orientation='h',y=-.2),margin=dict(t=20,b=120))
-        st.plotly_chart(fig,width='stretch')
+        st.plotly_chart(scientific_plot(fig,height=460),width='stretch',config=CHART_CONFIG)
         st.caption('No detrending. τ is capped at record duration / 10. Overlapping pairs are correlated and are not independent sample counts. A perfectly constant simulated signal has zero ADEV and is absent from a logarithmic plot.')
         st.dataframe(a,hide_index=True,width='stretch')
 
@@ -124,7 +138,7 @@ def render_legacy():
             f.update_yaxes(title_text=label,row=row,col=1)
         f.update_layout(template='plotly_dark',height=640,showlegend=False)
         f.update_xaxes(title_text='Elapsed time (s)',row=3,col=1)
-        st.plotly_chart(f,width='stretch')
+        st.plotly_chart(scientific_plot(f,height=550),width='stretch',config=CHART_CONFIG)
         names=['Electronic f+','Electronic f−','Nuclear f1','Nuclear f2','Electronic half-sum Dobs','Signed nuclear half-sum Qobs']
         table=pd.DataFrame({'Observable':names,'Nominal frequency (Hz)':diag['nominal_Hz'],'Local slope (Hz/K)':diag['slope_Hz_K'],'Fractional slope (/K)':diag['lambda_per_K']})
         st.dataframe(table,hide_index=True,width='stretch')
@@ -151,7 +165,7 @@ def render_legacy():
                 ef.add_trace(go.Scatter(x=v.tau_s,y=v.p05,line=dict(width=0),fill='tonexty',opacity=.18,fillcolor=color,showlegend=False))
                 ef.add_trace(go.Scatter(x=v.tau_s,y=v['median'],name=label,line_color=color))
             ef.update_layout(template='plotly_dark',xaxis_type='log',yaxis_type='log',xaxis_title='τ (s)',yaxis_title='ADEV',height=500)
-            st.plotly_chart(ef,width='stretch')
+            st.plotly_chart(scientific_plot(ef,height=460),width='stretch',config=CHART_CONFIG)
             st.caption('Shading is the 5th–95th percentile across simulated records. It is conditional on the model and is not a confidence interval for an experimental clock. Small ensembles give rough tail estimates.')
         st.markdown('Try increasing nuclear readout noise or slope error, then compare the curves. Set all environment and oscillator noise to zero to isolate readout. Set slope error to zero to inspect ideal local calibration; quadratic temperature effects remain.')
 
@@ -166,71 +180,8 @@ def render_legacy():
         st.caption('NIST SP 1065, Eq. (10), printed p.16. Samples are treated as contiguous rectangular interval averages.')
 
     with tabs[4]:
-        st.subheader('Research Paper Bucket')
-        reference_store=None
-        reference_error=None
-        try:
-            reference_store=ReferenceStore()
-            paper_bucket=reference_store.catalog()
-        except (OSError,sqlite3.Error,ValueError) as exc:
-            reference_error=str(exc)
-            paper_bucket=sources()
-            st.error('Persistent references unavailable: '+reference_error)
-        query=st.text_input('Search papers, equations, parameters, or implementation',key='legacy_search_papers_equations_parameters_or_implementation')
-        with st.expander('Add a paper'):
-            st.caption('Added papers are saved to this installation and exported as unverified references. A DOI does not verify a paper or map it to the scientific model.')
-            with st.form('add_paper'):
-                title=st.text_input('Title',key='legacy_title')
-                authors=st.text_input('Authors',key='legacy_authors')
-                year=st.number_input('Publication year',min_value=1800,max_value=2100,value=2026,step=1,key='legacy_publication_year')
-                journal=st.text_input('Journal or publication',key='legacy_journal_or_publication')
-                doi=st.text_input('DOI (optional)',key='legacy_doi_optional')
-                url=st.text_input('Paper URL',key='legacy_paper_url')
-                note=st.text_area('Note (optional)',key='legacy_note_optional')
-                submitted=st.form_submit_button('Add paper',type='primary')
-            if submitted:
-                try:
-                    if reference_store is None:
-                        raise ValueError('Persistent storage is unavailable. Reference was not saved.')
-                    reference_store.add(dict(title=title,authors=authors,year=year,journal=journal,
-                                             doi=doi,url=url,note=note))
-                    paper_bucket=reference_store.catalog()
-                    st.session_state.pop('export',None)
-                    st.success(f'Added "{title.strip()}". Saved as unverified.')
-                except (ValueError,OSError,sqlite3.Error) as exc:
-                    st.error(str(exc))
-        paper_count=sum(source['id']!='MODEL' and source.get('record_type')!='implementation_archive' for source in paper_bucket)
-        st.info(f'{paper_count} papers/research references and {len(paper_bucket)} total references are currently in the bucket.')
-        catalog_data=catalog_bytes(paper_bucket)
-        catalog_digest=hashlib.sha256(catalog_data).hexdigest()
-        st.download_button('Download Paper Bucket JSON',catalog_data,'sources.json','application/json',
-                           disabled=reference_error is not None)
-        st.download_button('Download Paper Bucket BibTeX',bibtex_bytes(paper_bucket),
-                           'references.bib','application/x-bibtex',disabled=reference_error is not None)
-        visible_papers=sorted(paper_bucket,key=lambda source:(source['year'],source['title'].lower()))
-        for source in visible_papers:
-            if query and query.lower() not in json.dumps(source).lower():continue
-            with st.expander(f"[{source['id']}] {source['title']} ({source['year']})"):
-                st.write(source['authors']+' · '+source['journal'])
-                st.write('Verification: '+verification_label(source))
-                st.write('Evidence: '+source['evidence'])
-                st.write('Location: '+source['locator'])
-                st.code(source['implementation'],language=None)
-                st.write(source['note'])
-                if source.get('doi'):
-                    st.link_button('DOI: '+source['doi'],'https://doi.org/'+source['doi'])
-                if source.get('url','').startswith(('https://','http://')):
-                    st.link_button('Source link',source['url'])
-        st.markdown('#### Every active parameter')
-        active_parameters=provenance(c)
-        if query:
-            active_parameters=active_parameters[active_parameters.astype(str).apply(lambda col:col.str.contains(query,case=False,regex=False)).any(axis=1)]
-        st.dataframe(active_parameters,hide_index=True,width='stretch')
-        st.markdown('#### Published measurement limits')
-        st.dataframe(benchmarks(),hide_index=True,width='stretch')
-        st.caption('These are reported upper bounds, not imported raw measurements. No published curve has been digitized. The 200000 s limit is not plotted unless the simulated record supports that averaging time.')
-        st.markdown('#### Equation-to-code map')
-        st.markdown((ROOT/'references/equation_map.md').read_text(encoding='utf-8'))
+        from .research_pages import render_paper_bucket
+        paper_bucket,catalog_digest,reference_error=render_paper_bucket(c,standalone=False)
 
     with tabs[5]:
         st.subheader('A reproducible record for your manuscript')

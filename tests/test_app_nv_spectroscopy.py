@@ -14,7 +14,7 @@ def test_marker_and_view_changes_reuse_spectrum_and_preserve_state(monkeypatch):
         return original(config, physics)
     monkeypatch.setattr(demo, 'spectrum', counted)
     app = AppTest.from_file(str(Path(__file__).resolve().parents[1]/'app.py'),default_timeout=90).run()
-    app.sidebar.radio(key='dashboard_section').set_value('NV-Center Demonstration').run()
+    app.sidebar.radio(key='dashboard_section').set_value('NV-Center & ODMR').run()
     assert not app.exception
     assert len(calls)==1
     slider = app.slider(key='nv_mw_frequency')
@@ -28,8 +28,8 @@ def test_marker_and_view_changes_reuse_spectrum_and_preserve_state(monkeypatch):
     assert app.metric[0].value=='1.000000'
     app.checkbox(key='nv_laser').set_value(False).run()
     assert app.metric[0].value=='Not modeled · laser off'
-    app.sidebar.radio(key='dashboard_section').set_value('Clock Overview').run()
-    app.sidebar.radio(key='dashboard_section').set_value('NV-Center Demonstration').run()
+    app.sidebar.radio(key='dashboard_section').set_value('Overview').run()
+    app.sidebar.radio(key='dashboard_section').set_value('NV-Center & ODMR').run()
     assert not app.exception
     assert app.slider(key='nv_mw_frequency').value==selected
     assert not app.checkbox(key='nv_overlays').value

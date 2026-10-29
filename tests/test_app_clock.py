@@ -1,7 +1,7 @@
 def test_existing_app_clock_controls_feedback_and_recalculation(research_app):
     app=research_app('Frequency lock')
     assert not app.exception
-    assert any(t.value=='Photon-based frequency lock' for t in app.subheader)
+    assert any(t.value.startswith('Photon-based NV reference · SIMULATION') for t in app.caption)
     app.selectbox(key='clock_cycles').set_value(32)
     app.button(key='run_clock').click().run()
     assert not app.exception

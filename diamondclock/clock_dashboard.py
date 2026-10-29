@@ -21,9 +21,8 @@ def cached_clock(values,fingerprint):
 
 
 def render_clock(fingerprint,paper_bucket,reference_error=None):
-    st.subheader('Photon-based frequency lock')
-    st.info('SIMULATION · Low-field NV-referenced oscillator, 5–50 G, E=0, 297 K. Counts drive acquisition and feedback. Locking and improved stability are not guaranteed. No SI accuracy or 475 G optical claim.')
-    with st.expander('Configure a photon-clock experiment',expanded=st.session_state.get('clock_result') is None), st.form('clock_controls'):
+    st.caption('Photon-based NV reference · SIMULATION · local axial 5–50 G, E=0, 297 K. Lock and stability improvement are evaluated separately.')
+    with st.expander('Configure a photon-clock experiment',expanded=st.session_state.get('clock_result') is None and st.session_state.get('clock_view','Current session run')=='Current session run'), st.form('clock_controls'):
         a,b,c=st.columns(3)
         states=a.selectbox('Clock optical states',[7,21],key='clock_states')
         field=b.number_input('Clock local axial field (G)',5.,50.,20.,key='clock_field')
@@ -59,7 +58,7 @@ def render_clock(fingerprint,paper_bucket,reference_error=None):
         st.caption('evaluation_* tables are offline truth diagnostics, never controller inputs. All raw tables are retained in the research bundle.')
         st.json({k:v for k,v in result['context'].items() if k!='files'})
     st.subheader('Reproducible research outputs')
-    st.caption('Prepare the existing complete export: CSV tables, configuration, source metadata, references, source snapshot, MATLAB attribution and SVG/PDF figures. The completed-run configuration is used even when controls have pending edits.')
+    st.caption('CSV tables, SVG/PDF figures, configuration, references and captured sources for this completed run. Also available in Exports & Documentation once prepared.')
     digest=hashlib.sha256(json.dumps(paper_bucket,sort_keys=True).encode()).hexdigest()
     if st.button('Prepare clock research bundle',key='prepare_clock_export',disabled=reference_error is not None):
         try:

@@ -4,8 +4,8 @@ def test_integrated_odmr_interaction_clock_comparison_and_export(research_app):
     assert any(t.value=='ODMR spectroscopy' for t in at.subheader)
     # Configure the preserved baseline before the optional paired ODMR comparison.
     at.selectbox(key='research_workspace').set_value('Stability & compensation').run()
-    at.sidebar.selectbox[0].set_value(4096)
-    at.sidebar.button[0].click().run()
+    at.selectbox(key='legacy_number_of_samples').set_value(4096)
+    at.button(key='run_legacy').click().run()
     at.selectbox(key='research_workspace').set_value('ODMR spectroscopy').run()
     at.checkbox(key='odmr_compare').set_value(True)
     at.button(key='run_odmr').click().run()

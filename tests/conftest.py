@@ -16,10 +16,11 @@ def research_app():
     def open_workspace(workspace='Stability & compensation', timeout=120):
         app = AppTest.from_file(str(Path(__file__).resolve().parents[1] / 'app.py'),
                                 default_timeout=timeout).run()
-        app.sidebar.radio(key='dashboard_mode').set_value('Research Mode').run()
-        app.sidebar.radio(key='dashboard_section').set_value('Advanced Research').run()
+        app.sidebar.radio(key='dashboard_section').set_value('Research Tools').run()
         if workspace != 'Stability & compensation':
             app.selectbox(key='research_workspace').set_value(workspace).run()
+        if workspace == 'Stability & compensation':
+            app.button(key='run_legacy').click().run()
         assert not app.exception
         return app
     return open_workspace

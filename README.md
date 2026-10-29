@@ -1,21 +1,17 @@
 # Diamond Atomic Clock
 
-**Dashboard redesign, Part 1:** the sidebar now provides Clock Overview,
-NV-Center Demonstration, Clock Performance and Advanced Research. Start in
-Demonstration Mode for the guided view; select Research Mode for scientific
-controls. All original tools remain under Advanced Research, and the photon-clock
-experiment also opens directly from Clock Performance. Overview does not run a
-simulation. See the [feature inventory and navigation guide](docs/DASHBOARD_REDESIGN.md).
-**Part 2:** NV-Center Demonstration now contains a rotatable Plotly diamond lattice,
-one nitrogen/vacancy pair, NV-axis overlays and low-field vector controls. This is
-educational geometry, independent of all ODMR/clock calculations. See
-[geometry, controls and limitations](docs/NV_VISUALIZATION.md).
-**Part 3:** that page now adds the existing engine's ODMR spectrum, a cached
-microwave-frequency selector and optional static excitation/readout overlays.
-The detailed optical-cycle and closed-loop clock models remain separate.
-See [integration and scientific limits](docs/NV_ODMR_DEMONSTRATION.md).
-The scientific scope paragraphs below describe their respective original phases;
-the Phase 4 section describes the implemented closed-loop photon-clock simulation.
+DiamondClock Lab connects NV-center physics, ODMR and photon measurement to
+simulated oscillator feedback and clock stability. The unified dashboard provides
+**Overview**, **NV-Center & ODMR**, **Clock Performance**, **Research Tools**,
+**Paper Bucket**, and **Exports & Documentation**, with no mode switch.
+Experiments run only after an explicit submission. Saved scientific examples can
+be inspected without recomputation.
+
+See [dashboard use and validation](docs/DASHBOARD_UX.md),
+[NV geometry](docs/NV_VISUALIZATION.md),
+[ODMR integration and limits](docs/NV_ODMR_DEMONSTRATION.md), and
+[clock results and reproducibility](docs/CLOCK_PERFORMANCE.md).
+The scope paragraphs below describe the individual models and their assumptions.
 
 Advanced nitrogen-14 NV-center **conditional frequency-stability simulator** with a Streamlit dashboard, Plotly exploration, traceable equations, and reproducible CSV/SVG/PDF exports. Version 0.1, prepared October 19, 2026.
 
@@ -163,7 +159,7 @@ python -m pytest -q
 
 Editable package discovery is explicit. The installed `diamondclock-clock` command
 also works outside the checkout; wheel installs include scientific assets/source
-snapshots. In the same Streamlit app, **Research Mode → Clock Performance** provides count-only
+snapshots. In the same Streamlit app, **Clock Performance** provides count-only
 acquisition, uncertainty, a causal latency-queued PI loop, oscillator phase/time
 error and output-based Allan deviation. Nothing is automatically deployed.
 
@@ -188,9 +184,9 @@ counts, fitted optical parameters and controller/noise assumptions are distingui
 in the Paper Bucket. This is an NV-referenced oscillator simulation, not an
 experimental accuracy claim or a validated 475 G composite clock.
 
-## Unified dashboard results (redesign Part 4)
+## Unified dashboard
 
-**Clock Overview** now summarizes the last completed session experiment and its
+**Overview** now summarizes the last completed session experiment and its
 scientific conclusion. **Clock Performance** presents photon acquisition, oscillator
 correction and lock flags, phase/time error, full-record or predeclared-window Allan
 deviation, and limitations. Each stability ratio identifies its matched averaging
@@ -199,11 +195,17 @@ time; observed lock is not treated as proof of better stability or absolute accu
 Choose **Browse saved experiments** for the original verified seven/21-state runs,
 failed-lock cases, and the quieter-oscillator example that locks but worsens stability.
 These read existing research bundles without rerunning or modifying historical data.
-Research Mode preserves the original controls, diagnostics, Paper Bucket-backed full
-CSV/provenance bundles and individual SVG/PDF figures. The 3D ODMR demonstration
+Research Tools preserves the original controls and diagnostics. Paper Bucket provides
+direct reference access; CSV/provenance bundles and SVG/PDF figures remain available
+in each workspace and Exports & Documentation. The 3D ODMR demonstration
 remains an independent educational workflow.
 
 See [Clock Performance guide](docs/CLOCK_PERFORMANCE.md) for exact run commands,
 comparison methodology, archive handling, limitations and reproducibility. The launch
 command remains `python -m streamlit run app.py --server.port 8502` after
 `python -m pip install -e ".[dev]"`. No merge or deployment is performed.
+
+The six navigation pages are **Overview**, **NV-Center & ODMR**, **Clock Performance**,
+**Research Tools**, **Paper Bucket**, and **Exports & Documentation**. No mode switch
+is required. All expensive experiments, including Stability & compensation, run only
+on explicit submission. See [dashboard use and validation](docs/DASHBOARD_UX.md).

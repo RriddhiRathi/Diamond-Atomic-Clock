@@ -3,6 +3,7 @@ from dataclasses import asdict
 import hashlib
 import json
 import streamlit as st
+from .plot_style import scientific_plot, CHART_CONFIG
 import plotly.graph_objects as go
 from .optical_parameters import OpticalConfig, OpticalExperiment, OpticalRates, Detector
 from .optical_reporting import calculate_optical, export_optical
@@ -20,7 +21,7 @@ def cached_optical(values,fingerprint):
 
 def render_optical(fingerprint,paper_bucket,reference_error=None):
     st.subheader('Optical excitation and photon measurements')
-    st.info('SIMULATION · Single local axial NV, 5–50 G, nominal 297 K. Contrast follows optical populations. These settings are independent of the 475 G clock sidebar; no frequency lock is simulated.')
+    st.caption('SIMULATION · Single local axial NV, 5–50 G, nominal 297 K. Contrast follows optical populations. These settings are independent of the 475 G clock sidebar; no frequency lock is simulated.')
     with st.form('optical_controls'):
         a,b,c=st.columns(3)
         states=a.selectbox('Optical model states',[7,21],key='optical_states')
@@ -51,7 +52,7 @@ def render_optical(fingerprint,paper_bucket,reference_error=None):
     fig.add_scatter(x=on.microwave_frequency_Hz/1e6,y=on.expected_counts,name='Optical-model expected counts')
     fig.add_scatter(x=on.microwave_frequency_Hz/1e6,y=on.detected_counts,mode='markers',name='Synthetic detected counts')
     fig.update_layout(xaxis_title='Microwave frequency (MHz)',yaxis_title='Photons per gate')
-    st.plotly_chart(fig,width='stretch');st.dataframe(data,hide_index=True)
+    st.plotly_chart(scientific_plot(fig),width='stretch',config=CHART_CONFIG);st.dataframe(data,hide_index=True)
     st.metric('Maximum expected contrast on sampled grid',f"{100*result['summary']['expected_maximum_grid_contrast']:.2f}%")
     st.caption('Contrast shown uses generated mean counts, including background. It is not an inferred resonance or an accuracy measurement.')
     digest=hashlib.sha256(json.dumps(paper_bucket,sort_keys=True).encode()).hexdigest()
