@@ -163,7 +163,7 @@ python -m pytest -q
 
 Editable package discovery is explicit. The installed `diamondclock-clock` command
 also works outside the checkout; wheel installs include scientific assets/source
-snapshots. In the same Streamlit app, the **Frequency lock** tab adds count-only
+snapshots. In the same Streamlit app, **Research Mode → Clock Performance** provides count-only
 acquisition, uncertainty, a causal latency-queued PI loop, oscillator phase/time
 error and output-based Allan deviation. Nothing is automatically deployed.
 
@@ -187,3 +187,23 @@ Scope remains local axial 5–50 G, E=0, 297 K; **475 G is rejected**. Synthetic
 counts, fitted optical parameters and controller/noise assumptions are distinguished
 in the Paper Bucket. This is an NV-referenced oscillator simulation, not an
 experimental accuracy claim or a validated 475 G composite clock.
+
+## Unified dashboard results (redesign Part 4)
+
+**Clock Overview** now summarizes the last completed session experiment and its
+scientific conclusion. **Clock Performance** presents photon acquisition, oscillator
+correction and lock flags, phase/time error, full-record or predeclared-window Allan
+deviation, and limitations. Each stability ratio identifies its matched averaging
+time; observed lock is not treated as proof of better stability or absolute accuracy.
+
+Choose **Browse saved experiments** for the original verified seven/21-state runs,
+failed-lock cases, and the quieter-oscillator example that locks but worsens stability.
+These read existing research bundles without rerunning or modifying historical data.
+Research Mode preserves the original controls, diagnostics, Paper Bucket-backed full
+CSV/provenance bundles and individual SVG/PDF figures. The 3D ODMR demonstration
+remains an independent educational workflow.
+
+See [Clock Performance guide](docs/CLOCK_PERFORMANCE.md) for exact run commands,
+comparison methodology, archive handling, limitations and reproducibility. The launch
+command remains `python -m streamlit run app.py --server.port 8502` after
+`python -m pip install -e ".[dev]"`. No merge or deployment is performed.

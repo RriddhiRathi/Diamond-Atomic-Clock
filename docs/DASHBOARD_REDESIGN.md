@@ -81,3 +81,16 @@ checks unchanged physics, historical output blobs, provenance and clean packagin
 Part 1 originally established the shell. Part 2 supplies the educational 3D lattice;
 no live spectrum integration, optical animation, new scientific model, regenerated
 research output or full performance redesign is included yet.
+
+## Part 4 completion
+
+The Part 1 table above is the historical inventory. Its deferred overview and clock
+results work is now implemented in [CLOCK_PERFORMANCE.md](CLOCK_PERFORMANCE.md).
+`clock_results.py` validates and adapts completed outputs, compares matched Allan
+points and generates evidence-based conclusions. `clock_presentation.py` renders
+the overview cards and five evidence sections, and reads verified historical export
+bundles without replacing current-session results. `clock_dashboard.py` retains the
+explicit form, caching, diagnostic tables and original research exporter. Navigation
+and pending input edits preserve the last completed run, its provenance and exports.
+No optical/clock calculation occurs on presentation or navigation; the Part 3 ODMR
+cache behavior remains unchanged. Parts 1–3 and all scientific workspaces are retained.

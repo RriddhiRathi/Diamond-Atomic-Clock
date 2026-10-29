@@ -2,13 +2,13 @@
 from dataclasses import asdict
 import hashlib,json
 import streamlit as st
-import plotly.graph_objects as go
 from .clock_parameters import ClockExperiment,ControllerConfig
 from .optical_parameters import OpticalConfig,Detector
 from .oscillator import OscillatorConfig
 from .clock_reporting import calculate_clock,export_clock
 from .reporting import zip_files
-from .run_provenance import validate
+from .clock_results import experiment
+from .clock_presentation import render_workspace, render_vector_downloads, allan_figure
 
 
 @st.cache_data(show_spinner=False)
@@ -23,7 +23,7 @@ def cached_clock(values,fingerprint):
 def render_clock(fingerprint,paper_bucket,reference_error=None):
     st.subheader('Photon-based frequency lock')
     st.info('SIMULATION · Low-field NV-referenced oscillator, 5–50 G, E=0, 297 K. Counts drive acquisition and feedback. Locking and improved stability are not guaranteed. No SI accuracy or 475 G optical claim.')
-    with st.form('clock_controls'):
+    with st.expander('Configure a photon-clock experiment',expanded=st.session_state.get('clock_result') is None), st.form('clock_controls'):
         a,b,c=st.columns(3)
         states=a.selectbox('Clock optical states',[7,21],key='clock_states')
         field=b.number_input('Clock local axial field (G)',5.,50.,20.,key='clock_field')
@@ -44,31 +44,37 @@ def render_clock(fingerprint,paper_bucket,reference_error=None):
         try:
             with st.spinner('Acquiring a resonance and running causal photon feedback…'):
                 st.session_state['clock_result']=(key,cached_clock(*key))
-        except ValueError as exc:st.session_state.pop('clock_result',None);st.error(str(exc))
-    saved=st.session_state.get('clock_result')
+            st.session_state['clock_view']='Current session run'
+        except ValueError as exc:st.error(str(exc))
+    saved=render_workspace()
     if saved is None:return
-    if saved[0]!=key:st.warning('Clock inputs changed. Simulate again for matching results.');return
-    result=saved[1]
-    try:validate(result['context'])
-    except ValueError as exc:st.error(str(exc));return
-    st.metric('Observed lock fraction',f"{100*result['summary']['observed_lock_fraction']:.1f}%")
-    st.caption('Lock detection uses counts and reported uncertainty. Hidden truth is reserved for offline error evaluation.')
-    render_clock_stability(result)
-    st.dataframe(result['tables']['feedback'],hide_index=True)
+    saved_key,result=saved
+    if saved_key!=key:
+        st.warning('Clock inputs changed. The displayed result retains its completed-run configuration. Simulate again for matching results.')
+    saved_config=experiment(saved_key[0])
+    with st.expander('Research diagnostics and completed configuration'):
+        st.json(saved_key[0])
+        table=st.selectbox('Diagnostic table',list(result['tables']),index=list(result['tables']).index('feedback'),key='clock_table_view')
+        st.dataframe(result['tables'][table],hide_index=True)
+        st.caption('evaluation_* tables are offline truth diagnostics, never controller inputs. All raw tables are retained in the research bundle.')
+        st.json({k:v for k,v in result['context'].items() if k!='files'})
+    st.subheader('Reproducible research outputs')
+    st.caption('Prepare the existing complete export: CSV tables, configuration, source metadata, references, source snapshot, MATLAB attribution and SVG/PDF figures. The completed-run configuration is used even when controls have pending edits.')
     digest=hashlib.sha256(json.dumps(paper_bucket,sort_keys=True).encode()).hexdigest()
     if st.button('Prepare clock research bundle',key='prepare_clock_export',disabled=reference_error is not None):
-        try:st.session_state['clock_export']=(key,digest,zip_files(export_clock(result,cfg,references=paper_bucket)))
+        try:
+            files=export_clock(result,saved_config,references=paper_bucket)
+            st.session_state['clock_export']=(saved_key,digest,zip_files(files))
+            st.session_state['clock_export_figures']=(saved_key,digest,{k:v for k,v in files.items() if k.endswith(('.svg','.pdf'))})
         except ValueError as exc:st.error(str(exc))
     value=st.session_state.get('clock_export')
-    if value and value[:2]==(key,digest):
+    if value and value[:2]==(saved_key,digest):
         st.download_button('Download complete clock run',value[2],'DiamondClock_phase4_SIMULATION.zip','application/zip')
+    figures=st.session_state.get('clock_export_figures')
+    if figures and figures[:2]==(saved_key,digest):
+        render_vector_downloads(figures[2])
 
 
 def render_clock_stability(result):
-    """The existing full-record Allan plot, shared with the read-only demo view."""
-    fig=go.Figure();data=result['tables']['allan']
-    for method in ('unlocked','locked'):
-        a=data[(data.method==method)&(data.adev>0)]
-        fig.add_scatter(x=a.tau_s,y=a.adev,name=('feedback enabled' if method=='locked' else 'free running')+', full record')
-    fig.update_layout(xaxis_type='log',yaxis_type='log',xaxis_title='Averaging time (s)',yaxis_title='Allan deviation')
-    st.plotly_chart(fig,width='stretch')
+    """Compatibility entry point for the original shared full-record chart."""
+    st.plotly_chart(allan_figure(result),width='stretch')

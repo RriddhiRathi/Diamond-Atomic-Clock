@@ -26,7 +26,8 @@ def test_landing_and_routes_do_not_calculate(monkeypatch):
     assert not app.exception
     assert app.sidebar.radio(key='dashboard_mode').value == MODES[0]
     assert app.sidebar.radio(key='dashboard_section').options == list(SECTIONS)
-    assert not app.button and not app.metric
+    assert {button.key for button in app.button} == {'nav_nv','nav_performance','nav_research','nav_clock_run','nav_clock_archive'}
+    assert not app.metric
     assert any('No completed clock run' in v.value for v in app.info)
     for section in SECTIONS:
         app.sidebar.radio(key='dashboard_section').set_value(section).run()
@@ -34,6 +35,8 @@ def test_landing_and_routes_do_not_calculate(monkeypatch):
         if section == 'NV-Center Demonstration':
             # A camera reset is now intentional; no experiment submit is exposed.
             assert [button.key for button in app.button] == ['reset_nv_camera']
+        elif section == 'Clock Overview':
+            assert all(button.key.startswith('nav_') for button in app.button)
         else:
             assert not app.button
     app.sidebar.radio(key='dashboard_section').set_value('Clock Performance').run()
@@ -69,20 +72,27 @@ def test_clock_run_survives_modes_and_routes_without_recalculation(monkeypatch):
     assert exported.startswith(b'PK')
     app.sidebar.radio(key='dashboard_section').set_value('Clock Overview').run()
     assert not app.exception
-    assert len(app.metric) == 3
+    assert len(app.metric) == 6
     assert app.metric[0].label == 'Observed lock fraction'
     app.sidebar.radio(key='dashboard_mode').set_value('Demonstration Mode').run()
     app.sidebar.radio(key='dashboard_section').set_value('NV-Center Demonstration').run()
     app.sidebar.radio(key='dashboard_section').set_value('Clock Performance').run()
     assert not app.exception
-    assert len(app.metric) == 3
+    assert len(app.metric) == 6
     assert not app.button
+    assert len(app.get('plotly_chart')) == 5
     app.sidebar.radio(key='dashboard_mode').set_value('Research Mode').run()
     assert not app.exception
     assert app.selectbox(key='clock_cycles').value == 32
     assert app.number_input(key='clock_gain').value == 2.
     assert app.session_state['clock_result'][1]['summary_sha256'] == result_hash
     assert app.session_state['clock_export'][2] == exported
+    # Unsubmitted form edits never discard a result or start a calculation.
+    app.number_input(key='clock_gain').set_value(4.).run()
+    assert not app.exception
+    assert app.session_state['clock_result'][1]['summary_sha256'] == result_hash
+    assert app.session_state['clock_export'][2] == exported
+    app.number_input(key='clock_gain').set_value(2.).run()
     # The same clock tool is reachable from Advanced Research without another run.
     app.session_state['research_workspace'] = 'Frequency lock'
     app.sidebar.radio(key='dashboard_section').set_value('Advanced Research').run()

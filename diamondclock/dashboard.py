@@ -35,60 +35,46 @@ def reference_catalog():
 
 
 def completed_clock():
-    """Read only a source-validated completed run; never calculate one."""
-    saved = st.session_state.get('clock_result')
-    if saved is None:
-        return None
-    from .run_provenance import source_fingerprint, validate
-
-    try:
-        if saved[0][1] != source_fingerprint():
-            raise ValueError('Source changed. Run the clock again in Research Mode.')
-        validate(saved[1]['context'])
-    except ValueError as exc:
-        st.warning(str(exc))
-        return None
-    return saved
+    """Read only a source/configuration/hash-validated completed run."""
+    from .clock_presentation import completed_clock as read_completed
+    return read_completed()
 
 
 def render_clock_summary(saved):
-    config, result = saved[0][0], saved[1]
-    summary = result['summary']
-    st.caption('LAST COMPLETED CLOCK RUN · CURRENT SESSION · SIMULATION')
-    a, b, c = st.columns(3)
-    a.metric('Observed lock fraction', f"{100 * summary['observed_lock_fraction']:.1f}%")
-    b.metric('Clock record', f"{summary['record_s']:.3f} s")
-    c.metric('Final feedback time error', f"{1e6 * summary['final_time_errors_s']['locked']:.1f} µs")
-    st.caption(f"{config['optical']['states']} states · {config['optical']['Bz_G']:g} G · "
-               f"{config['cycles']} cycles · seed {config['seed']} · "
-               f"{config['plant_backend']} optical solver")
-    st.info('Photons determine the feedback correction. An observed lock does not guarantee better '
-            'stability: compare the complete feedback and free-running Allan curves before drawing a conclusion.')
+    from .clock_presentation import render_summary
+    render_summary(saved[0][0],saved[1])
+
+
+def navigate(section, mode=None, view=None):
+    st.session_state['dashboard_section'] = section
+    if mode is not None:
+        st.session_state['dashboard_mode'] = mode
+    if view is not None:
+        st.session_state['clock_view'] = view
 
 
 def render_overview():
-    st.title('A diamond defect. A measurable resonance. A clock reference.')
-    st.markdown('Explore how the NV-center spin response becomes an optical signal, how photon '
-                'counts guide an oscillator, and when that feedback improves clock stability.')
-    left, right = st.columns([1.6, 1], gap='large')
-    with left, st.container(border=True):
-        st.subheader('The research question')
-        st.write('Can photon-based feedback hold an oscillator near an NV resonance—and what '
-                 'stability does the resulting clock output achieve under the chosen assumptions?')
-        st.markdown('**Physics → ODMR resonance → photon detection → frequency lock → stability**')
-        st.caption('Follow this sequence with the sidebar. Detailed models, references and exports '
-                   'remain available in Research Mode.')
-    with right, st.container(border=True):
-        st.subheader('Start with one experiment')
-        st.write('Seven-state optical model · local axial 20 G · 297 K')
-        st.write('10 ms photon gates · 128 feedback cycles · seed 410024')
-        st.caption('Starting settings for the Clock Performance workspace. No simulation runs on '
-                   'this landing page. A completed run below retains its own configuration.')
-    st.subheader('One experiment, one interpretation')
+    st.title('DiamondClock Lab')
+    st.write('Can photon measurements hold an oscillator near a diamond NV resonance—and does '
+             'that feedback improve its simulated frequency stability? Follow the evidence from spin to clock output.')
+    st.markdown('**NV spin system → ODMR → photon measurement → frequency feedback → Allan deviation**')
+    a,b,c = st.columns(3)
+    a.button('Explore NV physics & ODMR',key='nav_nv',on_click=navigate,args=(SECTIONS[1],))
+    b.button('Inspect clock evidence',key='nav_performance',on_click=navigate,args=(SECTIONS[2],))
+    c.button('Open research tools',key='nav_research',on_click=navigate,args=(SECTIONS[3],MODES[1]))
+    st.divider()
     saved = completed_clock()
     if saved is None:
-        st.info('No completed clock run in this session. Choose Research Mode → Clock Performance '
-                'and select “Simulate photon-based clock”. Return here for its summary.')
+        st.subheader('Follow one clock experiment')
+        st.info('No completed clock run in this session. Run a configured experiment or inspect a verified '
+                'historical example. Results appear here after a successful session run.')
+        a,b = st.columns(2)
+        a.button('Configure a clock run',key='nav_clock_run',on_click=navigate,
+                 args=(SECTIONS[2],MODES[1],'Current session run'))
+        b.button('Browse saved experiments',key='nav_clock_archive',on_click=navigate,
+                 args=(SECTIONS[2],None,'Verified historical example'))
+        st.caption('Examples include seven/21-state lock, failed acquisition or feedback, and observed lock '
+                   'with worse stability. Opening a saved example reads original data; it does not rerun the experiment.')
     else:
         render_clock_summary(saved)
     st.caption('RESEARCH SIMULATION · Model assumptions and synthetic counts; no experimental '
@@ -111,17 +97,10 @@ def render_performance(mode):
         papers, error = reference_catalog()
         render_clock(source_fingerprint(), papers, error)
         return
-    saved = completed_clock()
-    if saved is None:
-        st.info('Choose Research Mode to configure and run the photon-clock experiment. '
-                'Demonstration Mode displays its completed results without changing inputs or calculating again.')
-        return
-    render_clock_summary(saved)
-    from .clock_dashboard import render_clock_stability
-
-    render_clock_stability(saved[1])
-    st.caption('Full record, with acquisition and failures retained. Focused acquisition, correction '
-               'and time-error presentation will be added in a later redesign part; their existing exports remain available in Research Mode.')
+    from .clock_presentation import render_workspace
+    render_workspace()
+    st.caption('Configure new runs and prepare current-source research bundles in Research Mode. '
+               'Existing archived figures and bundles retain their original metadata.')
 
 
 def render_advanced(mode):
